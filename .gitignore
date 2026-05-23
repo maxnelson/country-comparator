@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Vite build output
+dist/
+dist-ssr/
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+logs/
+
+# Claude Code local settings (machine-specific)
+.claude/
+
+# Editor
+.DS_Store
+*.local
+
+# OS
+Thumbs.db

@@ -1,0 +1,25 @@
+.header {
+  background: var(--color-header-bg);
+  color: var(--color-header-text);
+}
+
+.inner {
+  max-width: var(--layout-max-width);
+  margin: 0 auto;
+  padding: 0 var(--layout-gutter);
+  height: var(--layout-header-height);
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-header-text);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.logo:hover {
+  opacity: 0.85;
+}

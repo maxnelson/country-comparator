@@ -1,0 +1,122 @@
+.wrapper {
+  overflow-x: auto;
+}
+
+.table {
+  display: grid;
+  grid-template-columns: repeat(var(--col-count), minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 100%;
+}
+
+/* ---------- Header cells (flags) ---------- */
+
+.headerCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-3);
+  background: var(--color-bg-subtle);
+}
+
+.flag {
+  font-size: 2.25rem;
+  line-height: 1;
+}
+
+.countryName {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.addCountry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-3);
+  background: var(--color-bg-subtle);
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.addCountry:hover {
+  background: var(--mint-50);
+  color: var(--color-brand-strong);
+}
+
+.addCountryIcon {
+  font-size: 2.25rem;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.addCountryLabel {
+  font-size: var(--font-size-sm);
+}
+
+/* ---------- Metric cells ---------- */
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  background: var(--color-bg);
+}
+
+.placeholder {
+  background: var(--color-bg-subtle);
+}
+
+.metricLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  line-height: 1.2;
+}
+
+.metricValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Add metric button ---------- */
+
+.addMetricRow {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-5);
+}
+
+.addMetricButton {
+  padding: var(--space-3) var(--space-5);
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.addMetricButton:hover {
+  background: var(--mint-50);
+  color: var(--color-brand-strong);
+  border-color: var(--mint-300);
+  border-style: solid;
+}

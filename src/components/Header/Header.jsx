@@ -4,7 +4,7 @@ function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <a href="/" className={styles.logo}>
+        <a href={import.meta.env.BASE_URL} className={styles.logo}>
           Country Comparator
         </a>
       </div>

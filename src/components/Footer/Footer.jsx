@@ -53,7 +53,7 @@ function Footer() {
           <p className={styles.copyright}>
             © {new Date().getFullYear()} Country Comparator
           </p>
-          <img src="/favicon.svg" alt="" className={styles.mark} />
+          <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" className={styles.mark} />
         </div>
       </div>
     </footer>

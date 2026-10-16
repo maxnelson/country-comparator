@@ -24,19 +24,19 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 | # | Decision | Status | Notes |
 |---|----------|--------|-------|
 | D1 | **Platform:** mobile-first Progressive Web App (PWA) built from the existing React + Vite app. Native app versions may follow later and will build on the finished web app. | Confirmed 2026-10-16 | Alternatives evaluated: native Swift, React Native / Expo. See *Platform evaluation* below. |
-| D2 | **Hosting:** static deploy on every push to `main` via GitHub Actions. Recommended: GitHub Pages to start (no new accounts; one toggle in repo settings), moving to Cloudflare Pages or Firebase Hosting when the app launches publicly or needs branch previews. Retire the App Engine config. | Proposed, awaiting owner confirmation | The app is a static site after `vite build`, so any static host works and switching later is cheap. See *Hosting evaluation* below. |
+| D2 | **Hosting:** static deploy on every push to `main` via GitHub Actions. Recommended: GitHub Pages to start (no new accounts; one toggle in repo settings), moving to Cloudflare Pages or Firebase Hosting when the app launches publicly or needs branch previews. Retire the App Engine config. | Confirmed 2026-10-16 | Live at https://maxnelson.github.io/country-comparator/. The app is a static site after `vite build`, so any static host works and switching later is cheap. See *Hosting evaluation* below. |
 | D3 | **Branching:** work directly on `main`. CI runs on every push. Branches only when the owner asks for one or when more than one person is working in the repo. | Confirmed 2026-10-16 | Solo project; PR overhead is not worth it from a phone. |
 
 ---
 
 ## Phase 0 — Foundations (make phone-driven development work)
 
-- [ ] Hosting pipeline (D2): GitHub Action that lints, builds, and publishes the site to a public URL on every push to `main`
+- [x] Hosting pipeline (D2): GitHub Action that lints, builds, and publishes the site to a public URL on every push to `main`
 - [ ] `CLAUDE.md`: project context, conventions, how to verify a change, workflow rules
 - [ ] `README.md`: what the app is, how to run it, how it deploys
 - [ ] SessionStart hook so cloud sessions install dependencies automatically
 - [ ] Minimal test setup (Vitest + React Testing Library) with one smoke test, run in CI
-- [ ] Remove `app.yaml` and `.gcloudignore` once D2 is confirmed
+- [x] Remove `app.yaml` and `.gcloudignore`
 
 ## Phase 1 — Mobile-first PWA shell (D1)
 

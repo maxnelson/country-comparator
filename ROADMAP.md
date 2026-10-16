@@ -2,7 +2,7 @@
 
 Living plan for the project. Work is grouped into phases; within a phase, items are in rough priority order. Tick items off as they ship. Raw ideas go in the **Inbox** at the bottom until they are sorted into a phase. Decisions that shape the project are logged in the **Decisions** table so future sessions know why things are the way they are.
 
-Last updated: 2026-10-15
+Last updated: 2026-10-16
 
 ---
 
@@ -23,20 +23,19 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 
 | # | Decision | Status | Notes |
 |---|----------|--------|-------|
-| D1 | **Platform:** mobile-first Progressive Web App (PWA) built from the existing React + Vite app. Store listings later via a Capacitor wrapper if wanted. | Proposed, recommended by Claude, awaiting owner confirmation | Alternatives evaluated: native Swift, React Native / Expo. See *Platform evaluation* below. |
-| D2 | **Hosting:** static deploy on every push to `main` via GitHub Actions (GitHub Pages first; Vercel/Netlify/Cloudflare are drop-in alternatives). Retire the App Engine config. | Proposed | Needed so changes can be tested on a phone minutes after they ship. |
-| D3 | **Branching:** small, self-contained changes on short-lived branches with a PR; CI (lint, build, tests) must be green before merge. | Proposed | PR descriptions and screenshots are phone-readable; diffs are not. |
+| D1 | **Platform:** mobile-first Progressive Web App (PWA) built from the existing React + Vite app. Native app versions may follow later and will build on the finished web app. | Confirmed 2026-10-16 | Alternatives evaluated: native Swift, React Native / Expo. See *Platform evaluation* below. |
+| D2 | **Hosting:** static deploy on every push to `main` via GitHub Actions. Recommended: GitHub Pages to start (no new accounts; one toggle in repo settings), moving to Cloudflare Pages or Firebase Hosting when the app launches publicly or needs branch previews. Retire the App Engine config. | Proposed, awaiting owner confirmation | The app is a static site after `vite build`, so any static host works and switching later is cheap. See *Hosting evaluation* below. |
+| D3 | **Branching:** work directly on `main`. CI runs on every push. Branches only when the owner asks for one or when more than one person is working in the repo. | Confirmed 2026-10-16 | Solo project; PR overhead is not worth it from a phone. |
 
 ---
 
 ## Phase 0 — Foundations (make phone-driven development work)
 
+- [ ] Hosting pipeline (D2): GitHub Action that lints, builds, and publishes the site to a public URL on every push to `main`
 - [ ] `CLAUDE.md`: project context, conventions, how to verify a change, workflow rules
 - [ ] `README.md`: what the app is, how to run it, how it deploys
-- [ ] GitHub Action: lint + build (+ tests) on every PR and push to `main`
-- [ ] Auto-deploy to a public URL on push to `main` (D2)
 - [ ] SessionStart hook so cloud sessions install dependencies automatically
-- [ ] Minimal test setup (Vitest + React Testing Library) with one smoke test
+- [ ] Minimal test setup (Vitest + React Testing Library) with one smoke test, run in CI
 - [ ] Remove `app.yaml` and `.gcloudignore` once D2 is confirmed
 
 ## Phase 1 — Mobile-first PWA shell (D1)
@@ -76,8 +75,8 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 
 ## Later / ideas (not scheduled)
 
-- Capacitor wrapper to list on the App Store and Play Store (reuses the web build; needs an Apple Developer account and a macOS or cloud build step)
-- iOS home-screen widgets (native-only; would ride on the Capacitor wrapper)
+- Native app versions (Capacitor wrapper first, since it reuses the web build; needs an Apple Developer account and a macOS or cloud build step)
+- iOS home-screen widgets (native-only; would ride on the native wrapper)
 - Dark mode
 - Charts and historical trends per metric
 - Unit toggle (imperial / metric) and localisation
@@ -109,13 +108,30 @@ Evaluated on 2026-10-15 against the project's real constraints: a solo developer
 | Widgets | Yes | Partial | No (needs native wrapper) |
 | Reuses current code | No | Partially | Entirely |
 
-**Recommendation:** 1c now. It is the only option whose full loop works from the train, it meets the desktop + phone requirement with one codebase, and it keeps the door to the stores open through a later Capacitor wrapper rather than closing it.
+**Outcome:** 1c, confirmed by the owner on 2026-10-16.
+
+## Hosting evaluation (background for D2)
+
+The built app is three static files (HTML, JS, CSS) plus a favicon. There is no server code, so the host only needs to serve files over HTTPS from a CDN and rebuild on every push.
+
+| | GitHub Pages | Cloudflare Pages | Firebase Hosting | App Engine (current config) |
+|---|---|---|---|---|
+| Setup from a phone | One toggle in repo settings; Claude commits the workflow | Create account, connect GitHub, pick repo | GCP console, service-account key into GitHub secrets | Service-account key into GitHub secrets |
+| Cost | Free (public repos) | Free, unlimited bandwidth | Free tier, then pay-as-you-go | Free tier of instance-hours, then pay |
+| Deploy time after push | ~1 min | ~1 min | ~1 min | Several minutes |
+| Branch preview URLs | No | Yes | Yes (channels) | Yes (versions), clunky |
+| Custom domain + HTTPS | Yes | Yes | Yes | Yes |
+| Commercial use | Discouraged by terms | Allowed | Allowed | Allowed |
+| Fit for a static site | Good | Excellent | Excellent | Poor: a Python runtime serving files |
+
+**Recommendation:** GitHub Pages now, because it needs no new accounts and the only manual step is one toggle. Move to Cloudflare Pages or Firebase Hosting when the app launches publicly or needs branch previews; for a static site that move is under an hour. App Engine is retired. If a backend is ever needed, Cloud Run or Cloud Functions on GCP pair fine with a static front-end on any of these hosts.
 
 ---
 
 ## How we work (phone-commute workflow)
 
+- Work directly on `main` (D3). Every task ends with a commit and a push.
 - One task per prompt, sized to a train ride. "Add a searchable country picker" is the right size.
-- Every task ends with lint, build and tests green, a desktop and phone screenshot, a commit, and a push.
+- Every task ends with lint, build and tests green, and a desktop and phone screenshot.
 - Prompts should say "decide and proceed" where possible; questions block while the owner is offline.
 - New ideas go in the Inbox. Decisions go in the Decisions table. Ticks go on the phase lists.

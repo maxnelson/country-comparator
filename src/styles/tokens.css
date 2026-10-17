@@ -83,8 +83,16 @@
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.5rem;
 
-  /* Layout */
+  /* Layout (mobile-first; widened below for larger screens) */
   --layout-max-width: 1200px;
-  --layout-header-height: 64px;
-  --layout-gutter: 1.5rem;
+  --layout-header-height: 56px;
+  --layout-gutter: 1rem;
+  --layout-breakpoint-md: 768px; /* documentation only: media queries cannot read custom properties */
+}
+
+@media (min-width: 768px) {
+  :root {
+    --layout-header-height: 64px;
+    --layout-gutter: 1.5rem;
+  }
 }

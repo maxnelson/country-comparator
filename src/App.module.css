@@ -6,8 +6,16 @@
 
 .main {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   max-width: var(--layout-max-width);
   width: 100%;
   margin: 0 auto;
-  padding: var(--space-6) var(--layout-gutter);
+  padding: 0 var(--layout-gutter) var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .main {
+    padding: var(--space-6) var(--layout-gutter);
+  }
 }

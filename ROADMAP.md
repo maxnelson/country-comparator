@@ -40,12 +40,12 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 
 ## Phase 1 — Mobile-first PWA shell (D1)
 
-- [ ] Rework the layout so the phone view is the default and desktop is the enhancement. Today the third country and the "Add country" button are off-screen on a phone.
+- [x] Rework the layout so the phone view is the default and desktop is the enhancement (metric rows with one label, sticky flag header, bottom action bar on phones, label column and toolbar on wide screens, compact number strings in narrow columns)
 - [ ] Web app manifest: name, short name, icons, theme color, `display: standalone`
 - [ ] Service worker for offline use and instant repeat loads (e.g. `vite-plugin-pwa`)
 - [ ] App icons and splash assets for iOS and Android
 - [ ] "Add to Home Screen" hint for iOS users (Safari never prompts on its own)
-- [ ] Mobile ergonomics: 44px touch targets, safe-area insets, sticky header, no layout jank
+- [x] Mobile ergonomics: 44px touch targets, safe-area insets, sticky header, no layout jank
 - [ ] Verify on a real iPhone and a real Android phone via the deployed URL
 
 ## Phase 2 — Core comparison UX
@@ -88,7 +88,7 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 
 Add raw ideas here. They get sorted into a phase during planning.
 
-- _(empty)_
+- Cap the number of countries on narrow screens (4 or 5) or add horizontal paging. Six or more columns on a phone are unreadable whatever the formatting. Belongs with the Phase 2 country picker.
 
 ---
 

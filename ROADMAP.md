@@ -90,6 +90,15 @@ Add raw ideas here. They get sorted into a phase during planning.
 
 - Cap the number of countries on narrow screens (4 or 5) or add horizontal paging. Six or more columns on a phone are unreadable whatever the formatting. Belongs with the Phase 2 country picker.
 
+Table UX ideas from the owner, 2026-10-17, under discussion (will replace most of Phase 2 once agreed):
+
+- Table scrolls horizontally with a minimum column width, instead of squeezing columns to fit. Proposed: ~110px on phones so three countries fit without scrolling, the flag header row stays stuck to the top and the metric labels stay stuck to the left. This would also retire the compact-number density tiers.
+- Dedicated "add country" column at the right end of the header row (circle-plus). Proposed: pinned to the right edge so it is always visible.
+- Adding a country is search-based: an input with an autocomplete list that filters as the user types. Proposed: a bottom sheet on phones and a popover on desktop, built as one picker component that is reused for metrics.
+- Dedicated "add metric" row, always the last row of the table. Lists the remaining metrics; search can be in from day one since the picker already has it. Proposed: pinned to the bottom of the scroll area so it is always visible.
+- Drag to reorder rows, and later columns. Reference from the owner: "the timeline application" (to clarify). Proposed: an Edit mode that shows drag handles and remove buttons, keeping the table clean otherwise.
+- Not mentioned yet but implied: removing a country or a metric. Proposed as part of the same Edit mode.
+
 ---
 
 ## Platform evaluation (background for D1)

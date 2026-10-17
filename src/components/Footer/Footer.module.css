@@ -1,4 +1,6 @@
 .footer {
+  position: sticky;
+  left: 0;
   border-top: 1px solid var(--color-border);
   background: var(--color-bg-subtle);
   padding: var(--space-8) 0 calc(var(--space-6) + env(safe-area-inset-bottom, 0px));

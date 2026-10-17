@@ -1,4 +1,6 @@
 .header {
+  position: sticky;
+  left: 0;
   background: var(--color-header-bg);
   color: var(--color-header-text);
 }

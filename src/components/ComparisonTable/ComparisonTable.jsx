@@ -5,11 +5,12 @@ import styles from './ComparisonTable.module.css'
 
 const INITIAL_COUNTRY_CODES = ['US', 'JP', 'DE']
 
-// Type size steps down as columns are added so values keep fitting.
-function densityFor(columnCount) {
-  if (columnCount <= 3) return 'comfortable'
-  if (columnCount <= 5) return 'compact'
-  return 'dense'
+function PlusIcon() {
+  return (
+    <svg className={styles.plusIcon} viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+      <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" fill="none" />
+    </svg>
+  )
 }
 
 function ComparisonTable() {
@@ -28,6 +29,7 @@ function ComparisonTable() {
   const canAddCountry = remainingCountries.length > 0
   const canAddMetric = visibleMetricCount < SAMPLE_METRICS.length
 
+  // Until the pickers ship (next roadmap steps), "add" appends the next item.
   const handleAddCountry = () => {
     if (!canAddCountry) return
     setActiveCodes((prev) => [...prev, remainingCountries[0].code])
@@ -38,72 +40,72 @@ function ComparisonTable() {
   }
 
   return (
-    <>
-      <section
-        className={styles.table}
-        data-density={densityFor(activeCountries.length)}
-        style={{ '--col-count': activeCountries.length }}
-        role="table"
-        aria-label="Country comparison"
-      >
-        {/* Sticky header row: flags + names */}
-        <div className={`${styles.row} ${styles.headerRow}`} role="row">
-          <div className={styles.corner} role="columnheader" aria-label="Metric" />
-          {activeCountries.map((country) => (
-            <div key={country.code} className={styles.headerCell} role="columnheader">
-              <span
-                className={styles.flag}
-                role="img"
-                aria-label={`${country.name} flag`}
-              >
-                {country.flag}
-              </span>
-              <span className={styles.countryName}>{country.name}</span>
+    <section
+      className={styles.table}
+      style={{ '--col-count': activeCountries.length }}
+      role="table"
+      aria-label="Country comparison"
+    >
+      {/* Header row: pinned to the top. Flags + names, then the add-country cell pinned right. */}
+      <div className={`${styles.row} ${styles.headerRow}`} role="row">
+        <div className={styles.corner} role="columnheader" aria-label="Metric" />
+        {activeCountries.map((country, i) => (
+          <div
+            key={country.code}
+            className={styles.headerCell}
+            style={{ '--i': i + 1 }}
+            role="columnheader"
+          >
+            <span className={styles.flag} role="img" aria-label={`${country.name} flag`}>
+              {country.flag}
+            </span>
+            <span className={styles.countryName}>{country.name}</span>
+          </div>
+        ))}
+        <div className={styles.addColumnCell} role="columnheader">
+          <button
+            type="button"
+            className={styles.addColumnButton}
+            onClick={handleAddCountry}
+            disabled={!canAddCountry}
+            aria-label="Add country"
+            title="Add country"
+          >
+            <PlusIcon />
+          </button>
+        </div>
+      </div>
+
+      {/* One row per metric: label (pinned left), then one value per country */}
+      {visibleMetrics.map((metric) => (
+        <div key={metric.key} className={styles.row} role="row">
+          <div className={styles.label} role="rowheader">
+            <span className={styles.labelText}>{metric.label}</span>
+          </div>
+          {activeCountries.map((country, i) => (
+            <div
+              key={country.code}
+              className={styles.value}
+              style={{ '--i': i + 1 }}
+              role="cell"
+            >
+              {metric.format(country.metrics[metric.key])}
             </div>
           ))}
         </div>
+      ))}
 
-        {/* One row per metric: label, then one value per country */}
-        {visibleMetrics.map((metric) => (
-          <div key={metric.key} className={styles.row} role="row">
-            <div className={styles.metricLabel} role="rowheader">
-              {metric.label}
-            </div>
-            {activeCountries.map((country) => {
-              const raw = country.metrics[metric.key]
-              const full = metric.format(raw)
-              const short = metric.formatCompact ? metric.formatCompact(raw) : full
-              return (
-                <div key={country.code} className={styles.value} role="cell">
-                  <span className={styles.full}>{full}</span>
-                  {short !== full && <span className={styles.short}>{short}</span>}
-                </div>
-              )
-            })}
+      {/* Add-metric row: always the last row, pinned to the bottom */}
+      {canAddMetric && (
+        <div className={`${styles.row} ${styles.addRow}`} role="row">
+          <div className={styles.addRowCell} role="cell">
+            <button type="button" className={styles.addRowButton} onClick={handleAddMetric}>
+              <PlusIcon /> Add metric
+            </button>
           </div>
-        ))}
-      </section>
-
-      {/* Bottom action bar on phones; toolbar above the table on wide screens */}
-      <div className={styles.actions}>
-        <button
-          type="button"
-          className={styles.action}
-          onClick={handleAddCountry}
-          disabled={!canAddCountry}
-        >
-          <span aria-hidden="true">+</span> Add country
-        </button>
-        <button
-          type="button"
-          className={styles.action}
-          onClick={handleAddMetric}
-          disabled={!canAddMetric}
-        >
-          <span aria-hidden="true">+</span> Add metric
-        </button>
-      </div>
-    </>
+        </div>
+      )}
+    </section>
   )
 }
 

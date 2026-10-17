@@ -6,11 +6,16 @@ import styles from './App.module.css'
 function App() {
   return (
     <div className={styles.app}>
-      <Header />
-      <main className={styles.main}>
-        <ComparisonTable />
-      </main>
-      <Footer />
+      {/* The page's only scroll container. Header and footer live inside it
+          so they scroll away vertically but stay put when the table scrolls
+          sideways. */}
+      <div className={styles.scroller}>
+        <Header />
+        <main className={styles.main}>
+          <ComparisonTable />
+        </main>
+        <Footer />
+      </div>
     </div>
   )
 }

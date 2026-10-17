@@ -84,7 +84,7 @@
   --font-size-xl: 1.5rem;
 
   /* Layout (mobile-first; widened below for larger screens) */
-  --layout-max-width: 1200px;
+  --layout-max-width: none; /* full width: the table uses every pixel it can get */
   --layout-header-height: 56px;
   --layout-gutter: 1rem;
   --layout-breakpoint-md: 768px; /* documentation only: media queries cannot read custom properties */

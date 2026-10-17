@@ -26,6 +26,7 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 | D1 | **Platform:** mobile-first Progressive Web App (PWA) built from the existing React + Vite app. Native app versions may follow later and will build on the finished web app. | Confirmed 2026-10-16 | Alternatives evaluated: native Swift, React Native / Expo. See *Platform evaluation* below. |
 | D2 | **Hosting:** static deploy on every push to `main` via GitHub Actions. Recommended: GitHub Pages to start (no new accounts; one toggle in repo settings), moving to Cloudflare Pages or Firebase Hosting when the app launches publicly or needs branch previews. Retire the App Engine config. | Confirmed 2026-10-16 | Live at https://maxnelson.github.io/country-comparator/. The app is a static site after `vite build`, so any static host works and switching later is cheap. See *Hosting evaluation* below. |
 | D3 | **Branching:** work directly on `main`. CI runs on every push. Branches only when the owner asks for one or when more than one person is working in the repo. | Confirmed 2026-10-16 | Solo project; PR overhead is not worth it from a phone. |
+| D4 | **Table interaction model:** frozen-panes grid (horizontal scroll with minimum column widths; pinned header row, label column, add-country button and add-metric row), search-based pickers in a bottom sheet / popover, and an Edit mode for remove and drag-reorder. | Confirmed 2026-10-17 | Owner's proposal, refined in discussion. Replaced the fit-to-width layout and compact-number tiers from Phase 1. |
 
 ---
 
@@ -40,7 +41,7 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 
 ## Phase 1 — Mobile-first PWA shell (D1)
 
-- [x] Rework the layout so the phone view is the default and desktop is the enhancement (metric rows with one label, sticky flag header, bottom action bar on phones, label column and toolbar on wide screens, compact number strings in narrow columns)
+- [x] Rework the layout so the phone view is the default and desktop is the enhancement (metric rows with one label, sticky flag header; the bottom action bar and compact-number tiers were later replaced by the Phase 2 frozen-panes table)
 - [ ] Web app manifest: name, short name, icons, theme color, `display: standalone`
 - [ ] Service worker for offline use and instant repeat loads (e.g. `vite-plugin-pwa`)
 - [ ] App icons and splash assets for iOS and Android
@@ -48,12 +49,13 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 - [x] Mobile ergonomics: 44px touch targets, safe-area insets, sticky header, no layout jank
 - [ ] Verify on a real iPhone and a real Android phone via the deployed URL
 
-## Phase 2 — Core comparison UX
+## Phase 2 — Table interaction (D4)
 
-- [ ] Country picker with search (replaces "add the next country in the list")
-- [ ] Remove and reorder countries
-- [ ] Metric picker: choose, hide, reorder; remember choices on the device
-- [ ] Put the comparison state in the URL (countries + metrics) so any view is shareable
+- [x] Frozen-panes table: horizontal scroll with minimum column widths; flag header row pinned top, metric labels pinned left, add-country button pinned top-right, add-metric row pinned bottom. One scroll container for the whole page; header and footer stay put sideways.
+- [ ] Country picker: search input with an autocomplete list; bottom sheet on phones, popover on desktop; matches partial names and codes; arrow keys and Enter; replaces "add the next country"
+- [ ] Metric picker reusing the same component (lists the metrics not yet shown)
+- [ ] Edit mode: remove buttons and drag handles on rows and columns; drag to reorder rows (dnd-kit), then columns
+- [ ] Put the comparison state in the URL (countries, metrics, order) so any view is shareable
 - [ ] Highlight the best / worst value in each row
 - [ ] Sensible first-run and empty states
 
@@ -88,16 +90,7 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 
 Add raw ideas here. They get sorted into a phase during planning.
 
-- Cap the number of countries on narrow screens (4 or 5) or add horizontal paging. Six or more columns on a phone are unreadable whatever the formatting. Belongs with the Phase 2 country picker.
-
-Table UX ideas from the owner, 2026-10-17, under discussion (will replace most of Phase 2 once agreed):
-
-- Table scrolls horizontally with a minimum column width, instead of squeezing columns to fit. Proposed: ~110px on phones so three countries fit without scrolling, the flag header row stays stuck to the top and the metric labels stay stuck to the left. This would also retire the compact-number density tiers.
-- Dedicated "add country" column at the right end of the header row (circle-plus). Proposed: pinned to the right edge so it is always visible.
-- Adding a country is search-based: an input with an autocomplete list that filters as the user types. Proposed: a bottom sheet on phones and a popover on desktop, built as one picker component that is reused for metrics.
-- Dedicated "add metric" row, always the last row of the table. Lists the remaining metrics; search can be in from day one since the picker already has it. Proposed: pinned to the bottom of the scroll area so it is always visible.
-- Drag to reorder rows, and later columns. Reference from the owner: "the timeline application" (to clarify). Proposed: an Edit mode that shows drag handles and remove buttons, keeping the table clean otherwise.
-- Not mentioned yet but implied: removing a country or a metric. Proposed as part of the same Edit mode.
+- Cap how wide value columns grow on very wide screens; with three countries on a 1920px display each column is over 500px.
 
 ---
 

@@ -1,21 +1,23 @@
 .app {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
 
-.main {
+.scroller {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  max-width: var(--layout-max-width);
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 var(--layout-gutter) var(--space-4);
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior-x: contain;
+}
+
+/* Full-bleed on phones so the table columns get the whole width */
+.main {
+  padding: 0 0 var(--space-4);
 }
 
 @media (min-width: 768px) {
   .main {
-    padding: var(--space-6) var(--layout-gutter);
+    padding: 0 0 var(--space-6);
   }
 }

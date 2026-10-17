@@ -1,42 +1,50 @@
 /* ------------------------------------------------------------------
-   Mobile-first comparison grid.
+   Frozen-panes comparison grid.
 
-   Each row is its own grid with the same column template, so columns
-   line up across rows without a single giant grid. On phones the metric
-   label spans the full width above the values; on wide screens it moves
-   into a left-hand column. `data-density` (set from the column count)
-   steps the value type size down so more countries still fit.
-   No ancestor may set overflow (other than visible) or the sticky
-   header row stops sticking.
+   One CSS grid for the whole table; each row is a subgrid so columns
+   line up while rows keep their own borders and backgrounds. Columns
+   never shrink below --col-min: when they fit they share the width,
+   when they don't the table is wider than the viewport and the page's
+   scroll container scrolls sideways. Everything "pinned" is position:
+   sticky against that scroll container: the header row (top), metric
+   labels (left), the add-country cell (right), the add-metric row
+   (bottom). Nothing between the scroller and this table may set
+   overflow other than visible or clip, or the pinning stops working.
+
+   Phones: a metric label spans the row above its values (grid row 1),
+   values sit on grid row 2. 768px and up: labels get their own column.
+   Cells are placed explicitly (--i from the component) because of that.
    ------------------------------------------------------------------ */
 
 .table {
-  --cols: repeat(var(--col-count), minmax(0, 1fr));
-  --value-size: 1.0625rem;
+  --col-min: 96px; /* floor for a value column; content can make it wider */
+  --add-col: 56px;
+  --value-col-start: 0; /* value i lands in column (start + i) */
+  --value-row: 2;
+  --pane-left: 0px; /* where sticky-left cells pin */
+  --pane-pad: var(--space-3); /* text inset inside pinned cells */
+  --value-size: 0.9375rem;
   --flag-size: 1.75rem;
 
-  /* Full-bleed on phones: reclaim the side gutters for the columns */
-  margin: 0 calc(-1 * var(--layout-gutter));
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
+  display: grid;
+  /* min-content lets a long number widen its column instead of wrapping;
+     the cells carry min-width: var(--col-min) as the floor */
+  grid-template-columns:
+    repeat(var(--col-count), minmax(min-content, 1fr))
+    var(--add-col);
+  column-gap: var(--space-2);
+  width: min-content; /* = sum of column minimums; text wraps within columns */
+  min-width: 100%;
   background: var(--color-bg);
-}
-
-.table[data-density='compact'] {
-  --value-size: 0.9375rem;
-  --flag-size: 1.5rem;
-}
-
-.table[data-density='dense'] {
-  --value-size: 0.8125rem;
-  --flag-size: 1.25rem;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .row {
   display: grid;
-  grid-template-columns: var(--cols);
-  column-gap: var(--space-2);
-  padding: var(--space-3) var(--layout-gutter);
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  grid-template-rows: auto auto;
+  padding: var(--space-3) 0;
   border-top: 1px solid var(--color-border);
 }
 
@@ -44,12 +52,13 @@
   border-top: 0;
 }
 
-/* ---------- Header row (flags) ---------- */
+/* ---------- Header row (pinned top) ---------- */
 
 .headerRow {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 3;
+  grid-template-rows: auto;
   align-items: end;
   background: var(--color-bg-subtle);
   border-bottom: 1px solid var(--color-border);
@@ -60,11 +69,15 @@
 }
 
 .headerCell {
+  grid-column: calc(var(--value-col-start) + var(--i));
+  grid-row: 1;
+  min-width: var(--col-min);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-1);
   min-width: 0;
+  padding: 0 var(--space-1);
   text-align: center;
 }
 
@@ -81,18 +94,79 @@
   hyphens: auto;
 }
 
+/* Add-country cell: pinned to the right edge while the table scrolls */
+.addColumnCell {
+  grid-column: -2 / -1;
+  grid-row: 1;
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  background: var(--color-bg-subtle);
+}
+
+.addColumnButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-brand-strong);
+  color: var(--color-text-inverse);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.addColumnButton:hover:not(:disabled) {
+  background: var(--mint-700);
+}
+
+.addColumnButton:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.addColumnButton:disabled {
+  background: var(--gray-300);
+  box-shadow: none;
+  cursor: default;
+}
+
+.plusIcon {
+  width: 20px;
+  height: 20px;
+}
+
 /* ---------- Metric rows ---------- */
 
-.metricLabel {
-  grid-column: 1 / -1;
+.label {
+  grid-column: 1 / -2;
+  grid-row: 1;
+  min-width: 0;
   margin-bottom: var(--space-1);
   font-size: 0.75rem;
   line-height: 1.2;
   color: var(--color-text-muted);
 }
 
+/* On phones only the label text pins left, so it reads at the edge
+   however far the row has scrolled */
+.labelText {
+  position: sticky;
+  left: var(--pane-pad);
+  display: inline-block;
+}
+
 .value {
-  min-width: 0;
+  grid-column: calc(var(--value-col-start) + var(--i));
+  grid-row: var(--value-row);
+  min-width: var(--col-min);
+  padding: 0 var(--space-1);
   text-align: center;
   font-size: var(--value-size);
   font-weight: 600;
@@ -104,44 +178,34 @@
   hyphens: auto;
 }
 
-/* A value renders its full string plus, where the metric defines one, a
-   compact string. Narrow columns show the compact one. */
-.short {
-  display: none;
-}
+/* ---------- Add-metric row (pinned bottom) ---------- */
 
-.table[data-density='compact'] .value:has(.short) .full,
-.table[data-density='dense'] .value:has(.short) .full {
-  display: none;
-}
-
-.table[data-density='compact'] .short,
-.table[data-density='dense'] .short {
-  display: inline;
-}
-
-/* ---------- Actions: sticky bottom bar on phones ---------- */
-
-.actions {
+.addRow {
   position: sticky;
   bottom: 0;
-  z-index: 2;
-  display: flex;
-  gap: var(--space-2);
-  margin: var(--space-4) calc(-1 * var(--layout-gutter)) 0;
-  padding: var(--space-2) var(--layout-gutter)
-    calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
-  background: var(--color-bg);
-  background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  z-index: 3;
+  grid-template-rows: auto;
+  padding: var(--space-2) 0;
+  background: var(--color-bg-subtle);
+  background: color-mix(in srgb, var(--color-bg-subtle) 94%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-top: 1px solid var(--color-border);
 }
 
-.action {
-  flex: 1;
+.addRowCell {
+  grid-column: 1 / -2;
+  grid-row: 1;
+}
+
+.addRowButton {
+  position: sticky;
+  left: var(--pane-pad);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   min-height: 44px;
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-4) 0 var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-bg);
@@ -153,82 +217,82 @@
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.action:hover:not(:disabled) {
+.addRowButton:hover {
   background: var(--mint-50);
   border-color: var(--mint-300);
   color: var(--color-brand-strong);
 }
 
-.action:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-/* ---------- Wide screens: card layout, label column, toolbar ---------- */
+/* ---------- Wide screens: card, label column, roomier type ---------- */
 
 @media (min-width: 768px) {
   .table {
-    --cols: minmax(160px, 220px) repeat(var(--col-count), minmax(0, 1fr));
+    --col-min: 160px;
+    --add-col: 64px;
+    --value-col-start: 1;
+    --value-row: 1;
+    --pane-pad: var(--layout-gutter);
     --value-size: 1.25rem;
     --flag-size: 2.25rem;
-    margin: 0;
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
-  }
-
-  .table[data-density='compact'] {
-    --value-size: 1.125rem;
-    --flag-size: 2rem;
-  }
-
-  .table[data-density='dense'] {
-    --value-size: 1rem;
-    --flag-size: 1.75rem;
+    grid-template-columns:
+      220px /* fixed, so the pinned label column never changes width */
+      repeat(var(--col-count), minmax(min-content, 1fr))
+      var(--add-col);
   }
 
   .row {
+    grid-template-rows: auto;
     align-items: center;
-    padding: var(--space-4) var(--space-5);
+    padding: var(--space-4) 0;
   }
 
   .headerRow {
-    border-radius: 12px 12px 0 0;
     padding-top: var(--space-5);
     padding-bottom: var(--space-5);
   }
 
-  .corner {
+  .corner,
+  .label {
+    grid-column: 1;
+    grid-row: 1;
+    position: sticky;
+    left: var(--pane-left);
+    z-index: 2;
     display: block;
+    margin: 0;
+    padding: 0 var(--space-4) 0 var(--pane-pad);
+    box-shadow: 1px 0 0 var(--color-border); /* divider that travels with the pinned column */
   }
 
-  .metricLabel {
-    grid-column: auto;
-    margin: 0;
+  .corner {
+    align-self: stretch;
+    background: var(--color-bg-subtle);
+  }
+
+  .label {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    background: var(--color-bg);
     font-size: var(--font-size-sm);
   }
 
-  /* Wide columns fit full numbers up to five countries */
-  .table[data-density='compact'] .value:has(.short) .full {
-    display: inline;
-  }
-
-  .table[data-density='compact'] .short {
-    display: none;
-  }
-
-  .actions {
+  .labelText {
     position: static;
-    order: -1; /* toolbar above the table */
-    justify-content: flex-end;
-    margin: 0 0 var(--space-4);
-    padding: 0;
-    background: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border-top: 0;
   }
 
-  .action {
-    flex: 0 0 auto;
+  .value {
+    padding: 0 var(--space-2);
+  }
+
+  .addRowCell {
+    grid-column: 1;
+    position: sticky;
+    left: var(--pane-left);
+    padding-left: var(--pane-pad);
+  }
+
+  .addRowButton {
+    position: static;
   }
 }

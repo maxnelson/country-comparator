@@ -26,6 +26,12 @@ describe('App', () => {
     expect(screen.getByText('Brazil')).toBeInTheDocument()
   })
 
+  it('keeps the add-metric row as the last row', () => {
+    render(<App />)
+    const rows = screen.getAllByRole('row')
+    expect(within(rows.at(-1)).getByRole('button', { name: 'Add metric' })).toBeInTheDocument()
+  })
+
   it('reveals another metric when "Add metric" is pressed', () => {
     render(<App />)
     expect(screen.queryByText('CO₂ (tons / capita)')).not.toBeInTheDocument()

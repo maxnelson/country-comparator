@@ -2,7 +2,7 @@
 
 Living plan for the project. Work is grouped into phases; within a phase, items are in rough priority order. Tick items off as they ship. Raw ideas go in the **Inbox** at the bottom until they are sorted into a phase. Decisions that shape the project are logged in the **Decisions** table so future sessions know why things are the way they are.
 
-Last updated: 2026-10-16
+Last updated: 2026-10-17
 
 ---
 
@@ -32,10 +32,10 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 ## Phase 0 — Foundations (make phone-driven development work)
 
 - [x] Hosting pipeline (D2): GitHub Action that lints, builds, and publishes the site to a public URL on every push to `main`
-- [ ] `CLAUDE.md`: project context, conventions, how to verify a change, workflow rules
-- [ ] `README.md`: what the app is, how to run it, how it deploys
-- [ ] SessionStart hook so cloud sessions install dependencies automatically
-- [ ] Minimal test setup (Vitest + React Testing Library) with one smoke test, run in CI
+- [x] `CLAUDE.md`: project context, conventions, how to verify a change, workflow rules
+- [x] `README.md`: what the app is, how to run it, how it deploys
+- [x] SessionStart hook so cloud sessions install dependencies automatically
+- [x] Minimal test setup (Vitest + React Testing Library) with one smoke test, run in CI
 - [x] Remove `app.yaml` and `.gcloudignore`
 
 ## Phase 1 — Mobile-first PWA shell (D1)

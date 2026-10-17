@@ -31,6 +31,8 @@ jobs:
 
       - run: npm run lint
 
+      - run: npm test
+
       # Resolves the site's base path ("/country-comparator" for a project
       # site, "" once a custom domain is attached). Skipped on PRs.
       - id: pages

@@ -14,8 +14,8 @@ dist-ssr/
 npm-debug.log*
 logs/
 
-# Claude Code local settings (machine-specific)
-.claude/
+# Claude Code: project settings and hooks are committed; local overrides are not
+.claude/settings.local.json
 
 # Editor
 .DS_Store

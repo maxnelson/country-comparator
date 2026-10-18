@@ -237,9 +237,7 @@
 
 /* ---------- Edit mode: drag handles and the row being dragged ---------- */
 
-.dragHandle {
-  position: sticky;
-  right: var(--pane-pad);
+.handle {
   flex: none;
   display: inline-flex;
   align-items: center;
@@ -257,31 +255,51 @@
 }
 
 /* 44px touch target around a 28px handle */
-.dragHandle::before {
+.handle::before {
   content: '';
   position: absolute;
   inset: -8px;
 }
 
-.dragHandle svg {
+.handle svg {
   width: 16px;
   height: 16px;
 }
 
-.dragHandle:hover,
-.dragHandle:focus-visible {
+.handle:hover,
+.handle:focus-visible {
   background: var(--color-bg-subtle);
   color: var(--color-text-muted);
 }
 
-.dragHandle:active,
-.row[data-dragging] .dragHandle {
+.handle:active,
+[data-dragging] .handle {
   cursor: grabbing;
+}
+
+/* Row handle: pinned to the right edge so it stays reachable on wide tables */
+.rowHandle {
+  position: sticky;
+  right: var(--pane-pad);
+}
+
+/* Column handle: top-left of the flag, mirroring the remove button top-right */
+.columnHandle {
+  position: absolute;
+  top: -4px;
+  right: calc(50% + var(--flag-size) * 0.5 + 6px);
 }
 
 .row[data-dragging] {
   z-index: 2;
   background: var(--color-bg);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+}
+
+.headerCell[data-dragging] {
+  z-index: 2;
+  background: var(--mint-50);
+  border-radius: 10px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
 }
 
@@ -409,9 +427,13 @@
     font-size: var(--font-size-sm);
   }
 
-  .dragHandle {
+  .rowHandle {
     position: relative;
     right: auto;
+  }
+
+  .columnHandle {
+    top: -2px;
   }
 
   .labelText {

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   DndContext,
   KeyboardSensor,
@@ -10,11 +10,16 @@ import {
 } from '@dnd-kit/core'
 import {
   SortableContext,
+  horizontalListSortingStrategy,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+import {
+  restrictToHorizontalAxis,
+  restrictToParentElement,
+  restrictToVerticalAxis,
+} from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
 import { SAMPLE_COUNTRIES } from '../../data/sampleCountries.js'
 import { SAMPLE_METRICS, DEFAULT_VISIBLE_METRIC_COUNT } from '../../data/sampleMetrics.js'
@@ -28,20 +33,23 @@ const MIN_COUNTRIES = 1
 const MIN_METRICS = 1
 
 const metricLabel = (key) => SAMPLE_METRICS.find((m) => m.key === key)?.label ?? key
+const countryName = (code) => SAMPLE_COUNTRIES.find((c) => c.code === code)?.name ?? code
 
-// Screen-reader announcements for drag and drop, using labels instead of keys
-const dragAnnouncements = {
-  onDragStart: ({ active }) => `Picked up ${metricLabel(active.id)}.`,
+// Screen-reader announcements for drag and drop, using names instead of ids
+const announcementsFor = (nameOf, kind) => ({
+  onDragStart: ({ active }) => `Picked up ${nameOf(active.id)}.`,
   onDragOver: ({ active, over }) =>
     over
-      ? `${metricLabel(active.id)} is over ${metricLabel(over.id)}.`
-      : `${metricLabel(active.id)} is no longer over a row.`,
+      ? `${nameOf(active.id)} is over ${nameOf(over.id)}.`
+      : `${nameOf(active.id)} is no longer over a ${kind}.`,
   onDragEnd: ({ active, over }) =>
     over
-      ? `${metricLabel(active.id)} was moved to the position of ${metricLabel(over.id)}.`
-      : `${metricLabel(active.id)} was dropped.`,
-  onDragCancel: ({ active }) => `Reordering ${metricLabel(active.id)} was cancelled.`,
-}
+      ? `${nameOf(active.id)} was moved to the position of ${nameOf(over.id)}.`
+      : `${nameOf(active.id)} was dropped.`,
+  onDragCancel: ({ active }) => `Reordering ${nameOf(active.id)} was cancelled.`,
+})
+const rowAnnouncements = announcementsFor(metricLabel, 'row')
+const columnAnnouncements = announcementsFor(countryName, 'column')
 
 function PlusIcon() {
   return (
@@ -103,7 +111,7 @@ function MetricRow({ metric, countries, editing, canRemove, onRemove }) {
           <button
             ref={setActivatorNodeRef}
             type="button"
-            className={styles.dragHandle}
+            className={`${styles.handle} ${styles.rowHandle}`}
             aria-label={`Reorder ${metric.label}`}
             {...attributes}
             {...listeners}
@@ -113,10 +121,82 @@ function MetricRow({ metric, countries, editing, canRemove, onRemove }) {
         )}
       </div>
       {countries.map((country, i) => (
-        <div key={country.code} className={styles.value} style={{ '--i': i + 1 }} role="cell">
+        <div
+          key={country.code}
+          className={styles.value}
+          style={{
+            '--i': i + 1,
+            // Follow the column's header cell while a column is being dragged
+            transform: `var(--col-transform-${i + 1}, none)`,
+            transition: `var(--col-transition-${i + 1}, none)`,
+            backgroundColor: `var(--col-bg-${i + 1}, transparent)`,
+          }}
+          role="cell"
+        >
           {metric.format(country.metrics[metric.key])}
         </div>
       ))}
+    </div>
+  )
+}
+
+function CountryHeader({ country, index, editing, canRemove, onRemove, tableRef }) {
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
+    useSortable({ id: country.code, disabled: !editing })
+  const col = index + 1
+  const transformString = CSS.Translate.toString(transform)
+
+  // A column is one header cell plus a value cell per row. The header cell is
+  // the sortable item; its shift is mirrored onto the value cells through CSS
+  // variables on the table, so the whole column moves as one.
+  useEffect(() => {
+    const table = tableRef.current
+    if (!table) return
+    table.style.setProperty(`--col-transform-${col}`, transformString ?? 'none')
+    table.style.setProperty(`--col-transition-${col}`, transition ?? 'none')
+    table.style.setProperty(`--col-bg-${col}`, isDragging ? 'var(--mint-50)' : 'transparent')
+    return () => {
+      table.style.removeProperty(`--col-transform-${col}`)
+      table.style.removeProperty(`--col-transition-${col}`)
+      table.style.removeProperty(`--col-bg-${col}`)
+    }
+  }, [tableRef, col, transformString, transition, isDragging])
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={styles.headerCell}
+      style={{ '--i': col, transform: transformString, transition }}
+      data-dragging={isDragging || undefined}
+      role="columnheader"
+    >
+      <span className={styles.flag} role="img" aria-label={`${country.name} flag`}>
+        {country.flag}
+      </span>
+      <span className={styles.countryName}>{country.name}</span>
+      {editing && (
+        <>
+          <button
+            ref={setActivatorNodeRef}
+            type="button"
+            className={`${styles.handle} ${styles.columnHandle}`}
+            aria-label={`Reorder ${country.name}`}
+            {...attributes}
+            {...listeners}
+          >
+            <GripIcon />
+          </button>
+          <button
+            type="button"
+            className={`${styles.removeButton} ${styles.removeColumn}`}
+            onClick={() => onRemove(country.code)}
+            disabled={!canRemove}
+            aria-label={`Remove ${country.name}`}
+          >
+            <RemoveIcon />
+          </button>
+        </>
+      )}
     </div>
   )
 }
@@ -125,6 +205,7 @@ function ComparisonTable() {
   const [activeCodes, setActiveCodes] = useState(INITIAL_COUNTRY_CODES)
   const [activeMetricKeys, setActiveMetricKeys] = useState(INITIAL_METRIC_KEYS)
   const [editing, setEditing] = useState(false)
+  const tableRef = useRef(null)
   const countryPickerRef = useRef(null)
   const metricPickerRef = useRef(null)
   const addCountryButtonRef = useRef(null)
@@ -172,70 +253,74 @@ function ComparisonTable() {
   const removeMetric = (key) =>
     setActiveMetricKeys((prev) => (prev.length > MIN_METRICS ? prev.filter((k) => k !== key) : prev))
 
-  const handleDragEnd = ({ active, over }) => {
+  const handleRowDragEnd = ({ active, over }) => {
     if (!over || active.id === over.id) return
     setActiveMetricKeys((prev) => moveItem(prev, active.id, over.id))
   }
 
-  return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      modifiers={[restrictToVerticalAxis]}
-      onDragEnd={handleDragEnd}
-      accessibility={{ announcements: dragAnnouncements }}
-    >
-      <section
-        className={styles.table}
-        style={{ '--col-count': activeCountries.length }}
-        data-editing={editing || undefined}
-        role="table"
-        aria-label="Country comparison"
-      >
-        {/* Header row: pinned to the top. Flags + names, then the add-country cell pinned right. */}
-        <div className={`${styles.row} ${styles.headerRow}`} role="row">
-          <div className={styles.corner} role="columnheader" aria-label="Metric" />
-          {activeCountries.map((country, i) => (
-            <div
-              key={country.code}
-              className={styles.headerCell}
-              style={{ '--i': i + 1 }}
-              role="columnheader"
-            >
-              <span className={styles.flag} role="img" aria-label={`${country.name} flag`}>
-                {country.flag}
-              </span>
-              <span className={styles.countryName}>{country.name}</span>
-              {editing && (
-                <button
-                  type="button"
-                  className={`${styles.removeButton} ${styles.removeColumn}`}
-                  onClick={() => removeCountry(country.code)}
-                  disabled={!canRemoveCountry}
-                  aria-label={`Remove ${country.name}`}
-                >
-                  <RemoveIcon />
-                </button>
-              )}
-            </div>
-          ))}
-          <div className={styles.addColumnCell} role="columnheader">
-            <button
-              ref={addCountryButtonRef}
-              type="button"
-              className={styles.addColumnButton}
-              onClick={() => countryPickerRef.current?.open(addCountryButtonRef.current)}
-              disabled={!canAddCountry}
-              aria-label="Add country"
-              title="Add country"
-            >
-              <PlusIcon />
-            </button>
-          </div>
-        </div>
+  const handleColumnDragEnd = ({ active, over }) => {
+    if (!over || active.id === over.id) return
+    setActiveCodes((prev) => moveItem(prev, active.id, over.id))
+  }
 
-        {/* One row per metric: label (pinned left), then one value per country.
-            Rows are sortable while editing. */}
+  return (
+    <section
+      ref={tableRef}
+      className={styles.table}
+      style={{ '--col-count': activeCountries.length }}
+      data-editing={editing || undefined}
+      role="table"
+      aria-label="Country comparison"
+    >
+    {/* Header row: pinned to the top. Flags + names (sortable while editing),
+        then the add-country cell pinned right. */}
+    <div className={`${styles.row} ${styles.headerRow}`} role="row">
+      <div className={styles.corner} role="columnheader" aria-label="Metric" />
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        modifiers={[restrictToHorizontalAxis, restrictToParentElement]}
+        onDragEnd={handleColumnDragEnd}
+        accessibility={{ announcements: columnAnnouncements }}
+      >
+        <SortableContext items={activeCodes} strategy={horizontalListSortingStrategy}>
+          {activeCountries.map((country, i) => (
+            <CountryHeader
+              key={country.code}
+              country={country}
+              index={i}
+              editing={editing}
+              canRemove={canRemoveCountry}
+              onRemove={removeCountry}
+              tableRef={tableRef}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
+      <div className={styles.addColumnCell} role="columnheader">
+          <button
+            ref={addCountryButtonRef}
+            type="button"
+            className={styles.addColumnButton}
+            onClick={() => countryPickerRef.current?.open(addCountryButtonRef.current)}
+            disabled={!canAddCountry}
+            aria-label="Add country"
+            title="Add country"
+          >
+            <PlusIcon />
+          </button>
+        </div>
+      </div>
+
+      {/* One row per metric: label (pinned left), then one value per country.
+          Rows are sortable while editing. */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+        onDragEnd={handleRowDragEnd}
+        accessibility={{ announcements: rowAnnouncements }}
+      >
         <SortableContext items={activeMetricKeys} strategy={verticalListSortingStrategy}>
           {visibleMetrics.map((metric) => (
             <MetricRow
@@ -248,48 +333,48 @@ function ComparisonTable() {
             />
           ))}
         </SortableContext>
+      </DndContext>
 
-        {/* Toolbar row: always the last row, pinned to the bottom */}
-        <div className={`${styles.row} ${styles.addRow}`} role="row">
-          <div className={styles.addRowCell} role="cell">
-            <button
-              ref={addMetricButtonRef}
-              type="button"
-              className={styles.addRowButton}
-              onClick={() => metricPickerRef.current?.open(addMetricButtonRef.current)}
-              disabled={!canAddMetric}
-            >
-              <PlusIcon /> Add metric
-            </button>
-            <button
-              type="button"
-              className={editing ? `${styles.editButton} ${styles.editing}` : styles.editButton}
-              onClick={() => setEditing((e) => !e)}
-              aria-pressed={editing}
-            >
-              {editing ? 'Done' : 'Edit'}
-            </button>
-          </div>
+      {/* Toolbar row: always the last row, pinned to the bottom */}
+      <div className={`${styles.row} ${styles.addRow}`} role="row">
+        <div className={styles.addRowCell} role="cell">
+          <button
+            ref={addMetricButtonRef}
+            type="button"
+            className={styles.addRowButton}
+            onClick={() => metricPickerRef.current?.open(addMetricButtonRef.current)}
+            disabled={!canAddMetric}
+          >
+            <PlusIcon /> Add metric
+          </button>
+          <button
+            type="button"
+            className={editing ? `${styles.editButton} ${styles.editing}` : styles.editButton}
+            onClick={() => setEditing((e) => !e)}
+            aria-pressed={editing}
+          >
+            {editing ? 'Done' : 'Edit'}
+          </button>
         </div>
+      </div>
 
-        <Picker
-          ref={countryPickerRef}
-          title="Add a country"
-          placeholder="Search countries"
-          emptyMessage="No countries match"
-          items={countryPickerItems}
-          onSelect={addCountry}
-        />
-        <Picker
-          ref={metricPickerRef}
-          title="Add a metric"
-          placeholder="Search metrics"
-          emptyMessage="No metrics match"
-          items={metricPickerItems}
-          onSelect={addMetric}
-        />
-      </section>
-    </DndContext>
+      <Picker
+        ref={countryPickerRef}
+        title="Add a country"
+        placeholder="Search countries"
+        emptyMessage="No countries match"
+        items={countryPickerItems}
+        onSelect={addCountry}
+      />
+      <Picker
+        ref={metricPickerRef}
+        title="Add a metric"
+        placeholder="Search metrics"
+        emptyMessage="No metrics match"
+        items={metricPickerItems}
+        onSelect={addMetric}
+      />
+    </section>
   )
 }
 

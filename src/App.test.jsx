@@ -125,13 +125,14 @@ describe('App', () => {
       expect(screen.getByRole('option', { name: /Japan/ })).toBeInTheDocument()
     })
 
-    it('shows a reorder handle on every metric row while editing', () => {
+    it('shows a reorder handle on every metric row and country column while editing', () => {
       render(<App />)
       expect(screen.queryByRole('button', { name: 'Reorder Population' })).not.toBeInTheDocument()
       fireEvent.click(button('Edit'))
       const handles = screen.getAllByRole('button', { name: /^Reorder / })
-      expect(handles).toHaveLength(12)
-      expect(handles[0]).toHaveAttribute('aria-roledescription', 'sortable')
+      expect(handles).toHaveLength(12 + 3)
+      expect(button('Reorder Population')).toHaveAttribute('aria-roledescription', 'sortable')
+      expect(button('Reorder Japan')).toHaveAttribute('aria-roledescription', 'sortable')
     })
 
     it('keeps at least one country', () => {

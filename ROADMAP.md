@@ -56,7 +56,7 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 - [x] Metric picker reusing the same component (lists the metrics not yet shown)
 - [x] Edit mode: an Edit/Done toggle in the pinned bottom toolbar reveals remove buttons on columns and rows; at least one country and one metric stay
 - [x] Drag to reorder rows in Edit mode (dnd-kit): grip handle at the right of each row, short hold on touch, keyboard with Space and arrows, auto-scroll near the edges
-- [ ] Drag to reorder columns in Edit mode
+- [x] Drag to reorder columns in Edit mode: grip at the top-left of each flag; the whole column (header and values) moves together
 - [ ] Put the comparison state in the URL (countries, metrics, order) so any view is shareable
 - [ ] Highlight the best / worst value in each row
 - [ ] Sensible first-run and empty states

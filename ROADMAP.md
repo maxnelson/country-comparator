@@ -2,7 +2,7 @@
 
 Living plan for the project. Work is grouped into phases; within a phase, items are in rough priority order. Tick items off as they ship. Raw ideas go in the **Inbox** at the bottom until they are sorted into a phase. Decisions that shape the project are logged in the **Decisions** table so future sessions know why things are the way they are.
 
-Last updated: 2026-10-17
+Last updated: 2026-10-18
 
 ---
 
@@ -52,7 +52,7 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 ## Phase 2 — Table interaction (D4)
 
 - [x] Frozen-panes table: horizontal scroll with minimum column widths; flag header row pinned top, metric labels pinned left, add-country button pinned top-right, add-metric row pinned bottom. One scroll container for the whole page; header and footer stay put sideways.
-- [ ] Country picker: search input with an autocomplete list; bottom sheet on phones, popover on desktop; matches partial names and codes; arrow keys and Enter; replaces "add the next country"
+- [x] Country picker: search input with an autocomplete list; bottom sheet on phones, popover on desktop; matches partial names, codes and aliases; arrow keys and Enter; replaces "add the next country"
 - [ ] Metric picker reusing the same component (lists the metrics not yet shown)
 - [ ] Edit mode: remove buttons and drag handles on rows and columns; drag to reorder rows (dnd-kit), then columns
 - [ ] Put the comparison state in the URL (countries, metrics, order) so any view is shareable

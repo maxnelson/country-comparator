@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { SAMPLE_COUNTRIES } from '../../data/sampleCountries.js'
 import { SAMPLE_METRICS, DEFAULT_VISIBLE_METRIC_COUNT } from '../../data/sampleMetrics.js'
+import Picker from '../Picker/Picker.jsx'
 import styles from './ComparisonTable.module.css'
 
 const INITIAL_COUNTRY_CODES = ['US', 'JP', 'DE']
@@ -16,6 +17,8 @@ function PlusIcon() {
 function ComparisonTable() {
   const [activeCodes, setActiveCodes] = useState(INITIAL_COUNTRY_CODES)
   const [visibleMetricCount, setVisibleMetricCount] = useState(DEFAULT_VISIBLE_METRIC_COUNT)
+  const countryPickerRef = useRef(null)
+  const addCountryButtonRef = useRef(null)
 
   const activeCountries = activeCodes
     .map((code) => SAMPLE_COUNTRIES.find((c) => c.code === code))
@@ -29,12 +32,23 @@ function ComparisonTable() {
   const canAddCountry = remainingCountries.length > 0
   const canAddMetric = visibleMetricCount < SAMPLE_METRICS.length
 
-  // Until the pickers ship (next roadmap steps), "add" appends the next item.
-  const handleAddCountry = () => {
-    if (!canAddCountry) return
-    setActiveCodes((prev) => [...prev, remainingCountries[0].code])
+  const countryPickerItems = remainingCountries.map((c) => ({
+    id: c.code,
+    label: c.name,
+    leading: c.flag,
+    hint: c.code,
+    keywords: [c.code, ...(c.aliases ?? [])],
+  }))
+
+  const openCountryPicker = () => {
+    countryPickerRef.current?.open(addCountryButtonRef.current)
   }
 
+  const handleSelectCountry = (item) => {
+    setActiveCodes((prev) => (prev.includes(item.id) ? prev : [...prev, item.id]))
+  }
+
+  // Until the metric picker ships (next roadmap step), "add" appends the next metric.
   const handleAddMetric = () => {
     setVisibleMetricCount((n) => Math.min(n + 1, SAMPLE_METRICS.length))
   }
@@ -64,9 +78,10 @@ function ComparisonTable() {
         ))}
         <div className={styles.addColumnCell} role="columnheader">
           <button
+            ref={addCountryButtonRef}
             type="button"
             className={styles.addColumnButton}
-            onClick={handleAddCountry}
+            onClick={openCountryPicker}
             disabled={!canAddCountry}
             aria-label="Add country"
             title="Add country"
@@ -105,6 +120,15 @@ function ComparisonTable() {
           </div>
         </div>
       )}
+
+      <Picker
+        ref={countryPickerRef}
+        title="Add a country"
+        placeholder="Search countries"
+        emptyMessage="No countries match"
+        items={countryPickerItems}
+        onSelect={handleSelectCountry}
+      />
     </section>
   )
 }

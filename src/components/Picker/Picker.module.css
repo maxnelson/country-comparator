@@ -1,0 +1,224 @@
+/* The dialog is a transparent layer the size of the visual viewport; the
+   panel inside is the sheet (phones) or the popover (wide screens). */
+
+.dialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+}
+
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.dialog::backdrop {
+  background: rgba(24, 24, 27, 0.4);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 85%;
+  background: var(--color-bg);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: slide-up 0.2s ease-out;
+}
+
+.grabber {
+  width: 36px;
+  height: 4px;
+  margin: var(--space-2) auto 0;
+  border-radius: 2px;
+  background: var(--gray-300);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2) 0 var(--space-4);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.close:hover {
+  background: var(--color-bg-subtle);
+  color: var(--color-text);
+}
+
+.close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.search {
+  padding: var(--space-2) var(--space-4) var(--space-2);
+}
+
+.input {
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-subtle);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 1rem; /* 16px minimum stops iOS zooming the page on focus */
+}
+
+.input:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -1px;
+  background: var(--color-bg);
+}
+
+.list {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0 var(--space-2) var(--space-2);
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: 0 var(--space-3);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.active {
+  background: var(--mint-50);
+}
+
+.leading {
+  width: 32px;
+  font-size: 1.5rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-size-base);
+}
+
+.hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  margin: 0;
+  padding: var(--space-5) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    animation: none;
+  }
+}
+
+/* ---------- Wide screens: popover anchored to the opening button ---------- */
+
+@media (min-width: 768px) {
+  .dialog[open] {
+    display: block;
+  }
+
+  .dialog::backdrop {
+    background: rgba(24, 24, 27, 0.12);
+  }
+
+  .panel {
+    position: absolute;
+    top: 10vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 360px;
+    max-height: min(480px, calc(100vh - 10vh - 24px));
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+    padding-bottom: 0;
+    animation: fade-in 0.12s ease-out;
+  }
+
+  .dialog[data-anchored] .panel {
+    top: var(--anchor-top);
+    right: var(--anchor-right);
+    left: auto;
+    transform: none;
+    max-height: min(480px, calc(100vh - var(--anchor-top) - 24px));
+  }
+
+  .grabber {
+    display: none;
+  }
+
+  .header {
+    padding-top: var(--space-3);
+  }
+}

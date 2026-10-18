@@ -1,4 +1,5 @@
 // Sample country data — placeholder values for UI development.
+// `aliases` are extra search terms for the country picker (codes are matched automatically).
 // Real data will be wired up in a later step.
 
 export const SAMPLE_COUNTRIES = [
@@ -6,6 +7,7 @@ export const SAMPLE_COUNTRIES = [
     code: 'US',
     name: 'United States',
     flag: '🇺🇸',
+    aliases: ['USA', 'America', 'United States of America'],
     metrics: {
       population: 333287557,
       area_sq_mi: 3796742,
@@ -33,6 +35,7 @@ export const SAMPLE_COUNTRIES = [
     code: 'JP',
     name: 'Japan',
     flag: '🇯🇵',
+    aliases: ['Nippon', 'Nihon'],
     metrics: {
       population: 125700000,
       area_sq_mi: 145937,
@@ -60,6 +63,7 @@ export const SAMPLE_COUNTRIES = [
     code: 'DE',
     name: 'Germany',
     flag: '🇩🇪',
+    aliases: ['Deutschland'],
     metrics: {
       population: 84358845,
       area_sq_mi: 137988,
@@ -87,6 +91,7 @@ export const SAMPLE_COUNTRIES = [
     code: 'BR',
     name: 'Brazil',
     flag: '🇧🇷',
+    aliases: ['Brasil'],
     metrics: {
       population: 215313498,
       area_sq_mi: 3287956,
@@ -114,6 +119,7 @@ export const SAMPLE_COUNTRIES = [
     code: 'IN',
     name: 'India',
     flag: '🇮🇳',
+    aliases: ['Bharat'],
     metrics: {
       population: 1428627663,
       area_sq_mi: 1269219,
@@ -141,6 +147,7 @@ export const SAMPLE_COUNTRIES = [
     code: 'FR',
     name: 'France',
     flag: '🇫🇷',
+    aliases: ['République française'],
     metrics: {
       population: 68042591,
       area_sq_mi: 248573,
@@ -168,6 +175,7 @@ export const SAMPLE_COUNTRIES = [
     code: 'GB',
     name: 'United Kingdom',
     flag: '🇬🇧',
+    aliases: ['UK', 'Britain', 'Great Britain', 'England', 'Scotland', 'Wales'],
     metrics: {
       population: 67596281,
       area_sq_mi: 93628,
@@ -195,6 +203,7 @@ export const SAMPLE_COUNTRIES = [
     code: 'CA',
     name: 'Canada',
     flag: '🇨🇦',
+    aliases: [],
     metrics: {
       population: 38929902,
       area_sq_mi: 3855103,

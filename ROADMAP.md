@@ -47,7 +47,7 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 - [x] Web app manifest: name, short name ("Countries" on the home screen), icons, theme color, `display: standalone`
 - [x] Service worker for offline use and instant repeat loads (`vite-plugin-pwa`; the whole build is precached and a new deploy reloads the page, see D6)
 - [x] App icons for iOS and Android (favicon, Android any and maskable, iOS touch icon, all drawn by `scripts/make-icons.mjs`). Android builds its splash from the manifest colours; iOS shows a plain launch screen unless per-device startup images are added later
-- [ ] "Add to Home Screen" hint for iOS users (Safari never prompts on its own)
+- [x] "Add to Home Screen" hint for iOS users (Safari never prompts on its own): a banner under the header, iOS browsers only, hidden once installed; Dismiss snoozes it for 30 days
 - [x] Mobile ergonomics: 44px touch targets, safe-area insets, sticky header, no layout jank
 - [ ] Verify on a real iPhone and a real Android phone via the deployed URL
 

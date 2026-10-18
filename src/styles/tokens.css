@@ -61,6 +61,7 @@
   /* Brand */
   --color-brand:        var(--mint-400);
   --color-brand-strong: var(--mint-600);
+  --color-brand-subtle: var(--mint-50);
   --color-accent:       var(--teal-500);
   --color-danger:       #DC2626;
   --color-danger-strong: #B91C1C;

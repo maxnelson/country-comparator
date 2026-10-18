@@ -1,4 +1,5 @@
 import Header from './components/Header/Header.jsx'
+import InstallHint from './components/InstallHint/InstallHint.jsx'
 import Footer from './components/Footer/Footer.jsx'
 import ComparisonTable from './components/ComparisonTable/ComparisonTable.jsx'
 import styles from './App.module.css'
@@ -11,6 +12,7 @@ function App() {
           sideways. */}
       <div className={styles.scroller}>
         <Header />
+        <InstallHint />
         <main className={styles.main}>
           <ComparisonTable />
         </main>

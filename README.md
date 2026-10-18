@@ -6,6 +6,8 @@ Compare countries side by side. A mobile-first web app meant to be pulled up on 
 
 Status: early prototype. The eight countries and twenty metrics are sample data; real sources come later (see the roadmap).
 
+Every comparison is a link. The countries, metrics and their order live in the query string, for example `?c=FR,CA&m=capital,currency`, so the URL in the address bar can be shared as is.
+
 ## Develop
 
 Requires Node 22.

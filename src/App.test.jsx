@@ -1,6 +1,9 @@
 import { render, screen, within, fireEvent } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { afterEach, describe, it, expect } from 'vitest'
 import App from './App.jsx'
+
+// Tests share one jsdom window; leave the URL clean for the next one
+afterEach(() => window.history.replaceState(null, '', '/'))
 
 const search = (name) => screen.getByRole('combobox', { name })
 const button = (name) => screen.getByRole('button', { name })
@@ -26,6 +29,38 @@ describe('App', () => {
     render(<App />)
     const rows = screen.getAllByRole('row')
     expect(within(rows.at(-1)).getByRole('button', { name: 'Add metric' })).toBeInTheDocument()
+  })
+
+  describe('URL state', () => {
+    it('reads the comparison from the query string', () => {
+      window.history.replaceState(null, '', '/?c=fr,ca&m=capital,currency')
+      render(<App />)
+      const headers = screen.getAllByRole('columnheader').map((h) => h.textContent)
+      expect(headers.filter((t) => t.includes('France') || t.includes('Canada'))).toHaveLength(2)
+      expect(screen.queryByRole('columnheader', { name: /Japan/ })).not.toBeInTheDocument()
+      expect(screen.getAllByRole('rowheader').map((r) => r.textContent)).toEqual(['Capital', 'Currency'])
+      expect(document.title).toBe('France vs Canada · Country Comparator')
+    })
+
+    it('writes changes back to the URL, omitting defaults', () => {
+      render(<App />)
+      expect(window.location.search).toBe('')
+      fireEvent.click(button('Add country'))
+      fireEvent.click(screen.getByRole('option', { name: /France/ }))
+      expect(window.location.search).toBe('?c=US,JP,DE,FR')
+      fireEvent.click(button('Edit'))
+      fireEvent.click(button('Remove Population'))
+      expect(window.location.search).toMatch(/^\?c=US,JP,DE,FR&m=area_sq_mi,/)
+      expect(window.location.search).not.toContain('population')
+    })
+
+    it('ignores junk in the URL and falls back to the defaults', () => {
+      window.history.replaceState(null, '', '/?c=XX,YY&m=nothing')
+      render(<App />)
+      expect(screen.getByRole('columnheader', { name: /Japan/ })).toBeInTheDocument()
+      expect(screen.getByText('Population')).toBeInTheDocument()
+      expect(window.location.search).toBe('')
+    })
   })
 
   describe('country picker', () => {

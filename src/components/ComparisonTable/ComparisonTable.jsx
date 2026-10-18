@@ -22,13 +22,12 @@ import {
 } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
 import { SAMPLE_COUNTRIES } from '../../data/sampleCountries.js'
-import { SAMPLE_METRICS, DEFAULT_VISIBLE_METRIC_COUNT } from '../../data/sampleMetrics.js'
+import { SAMPLE_METRICS } from '../../data/sampleMetrics.js'
 import Picker from '../Picker/Picker.jsx'
+import { buildSearch, parseSearch, titleFor } from '../../state/urlState.js'
 import { moveItem } from './reorder.js'
 import styles from './ComparisonTable.module.css'
 
-const INITIAL_COUNTRY_CODES = ['US', 'JP', 'DE']
-const INITIAL_METRIC_KEYS = SAMPLE_METRICS.slice(0, DEFAULT_VISIBLE_METRIC_COUNT).map((m) => m.key)
 const MIN_COUNTRIES = 1
 const MIN_METRICS = 1
 
@@ -202,9 +201,32 @@ function CountryHeader({ country, index, editing, canRemove, onRemove, tableRef 
 }
 
 function ComparisonTable() {
-  const [activeCodes, setActiveCodes] = useState(INITIAL_COUNTRY_CODES)
-  const [activeMetricKeys, setActiveMetricKeys] = useState(INITIAL_METRIC_KEYS)
+  // The comparison starts from the URL and is written back to it on every change
+  const [activeCodes, setActiveCodes] = useState(() => parseSearch(window.location.search).codes)
+  const [activeMetricKeys, setActiveMetricKeys] = useState(
+    () => parseSearch(window.location.search).metricKeys,
+  )
   const [editing, setEditing] = useState(false)
+
+  useEffect(() => {
+    const search = buildSearch({ codes: activeCodes, metricKeys: activeMetricKeys })
+    const { pathname, hash } = window.location
+    if (window.location.search !== search) {
+      window.history.replaceState(null, '', `${pathname}${search}${hash}`)
+    }
+    document.title = titleFor(activeCodes)
+  }, [activeCodes, activeMetricKeys])
+
+  // Back/forward between differing URLs re-reads the comparison
+  useEffect(() => {
+    const handlePopState = () => {
+      const next = parseSearch(window.location.search)
+      setActiveCodes(next.codes)
+      setActiveMetricKeys(next.metricKeys)
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
   const tableRef = useRef(null)
   const countryPickerRef = useRef(null)
   const metricPickerRef = useRef(null)

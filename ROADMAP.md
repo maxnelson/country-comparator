@@ -27,6 +27,7 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 | D2 | **Hosting:** static deploy on every push to `main` via GitHub Actions. Recommended: GitHub Pages to start (no new accounts; one toggle in repo settings), moving to Cloudflare Pages or Firebase Hosting when the app launches publicly or needs branch previews. Retire the App Engine config. | Confirmed 2026-10-16 | Live at https://maxnelson.github.io/country-comparator/. The app is a static site after `vite build`, so any static host works and switching later is cheap. See *Hosting evaluation* below. |
 | D3 | **Branching:** work directly on `main`. CI runs on every push. Branches only when the owner asks for one or when more than one person is working in the repo. | Confirmed 2026-10-16 | Solo project; PR overhead is not worth it from a phone. |
 | D5 | **Data:** ships as a committed JSON built by `npm run data:refresh` (no runtime fetching), from the World Bank Indicators API (CC BY 4.0) for numbers and mledoze/countries (ODbL 1.0) for the catalog; CIA World Factbook (public domain) next for median age and coastline. Wikidata (CC0) is the fallback for the catalog if ODbL share-alike ever matters. The Factbook is a frozen archive since the CIA ended it in February 2026; its fields will need a living source eventually (UN World Population Prospects for median age and fertility). | Confirmed 2026-10-18 | Dropped for now: public debt (World Bank series sparse and decades stale), tourist arrivals (series ends in the 2020 pandemic year), average temperature, UNESCO sites, top income tax rate (no clean source yet). |
+| D6 | **PWA shell:** `vite-plugin-pwa` with a Workbox service worker that precaches the whole build, data included, so the app opens offline. Update strategy is `autoUpdate`: a new deploy installs in the background and the page reloads itself, which loses nothing because all state is in the URL. Home-screen name "Countries"; icon is two bars on the header teal, drawn in `scripts/make-icons.mjs`. | Confirmed 2026-10-18 | The alternative, a "new version available" prompt, is more UI for no gain here. Short name because iOS truncates labels at about 12 characters. |
 | D4 | **Table interaction model:** frozen-panes grid (horizontal scroll with minimum column widths; pinned header row, label column, add-country button and add-metric row), search-based pickers in a bottom sheet / popover, and an Edit mode for remove and drag-reorder. | Confirmed 2026-10-17 | Owner's proposal, refined in discussion. Replaced the fit-to-width layout and compact-number tiers from Phase 1. |
 
 ---
@@ -43,9 +44,9 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 ## Phase 1 — Mobile-first PWA shell (D1)
 
 - [x] Rework the layout so the phone view is the default and desktop is the enhancement (metric rows with one label, sticky flag header; the bottom action bar and compact-number tiers were later replaced by the Phase 2 frozen-panes table)
-- [ ] Web app manifest: name, short name, icons, theme color, `display: standalone`
-- [ ] Service worker for offline use and instant repeat loads (e.g. `vite-plugin-pwa`)
-- [ ] App icons and splash assets for iOS and Android
+- [x] Web app manifest: name, short name ("Countries" on the home screen), icons, theme color, `display: standalone`
+- [x] Service worker for offline use and instant repeat loads (`vite-plugin-pwa`; the whole build is precached and a new deploy reloads the page, see D6)
+- [x] App icons for iOS and Android (favicon, Android any and maskable, iOS touch icon, all drawn by `scripts/make-icons.mjs`). Android builds its splash from the manifest colours; iOS shows a plain launch screen unless per-device startup images are added later
 - [ ] "Add to Home Screen" hint for iOS users (Safari never prompts on its own)
 - [x] Mobile ergonomics: 44px touch targets, safe-area insets, sticky header, no layout jank
 - [ ] Verify on a real iPhone and a real Android phone via the deployed URL
@@ -97,6 +98,7 @@ Add raw ideas here. They get sorted into a phase during planning.
 
 - Cap how wide value columns grow on very wide screens; with three countries on a 1920px display each column is over 500px.
 - The data JSON is bundled into the main script (about 32 KB gzipped). Lazy-load it if the bundle keeps growing.
+- In the installed app the iOS status bar is the opaque default. If it looks wrong on a real iPhone, switch to `black-translucent` and pad the header and the pinned table header by `env(safe-area-inset-top)`.
 - Factbook-derived metrics are frozen at the final 2025/2026 edition. Replace median age and fertility with UN World Population Prospects (CC BY 3.0 IGO) when they start to feel stale.
 
 ---

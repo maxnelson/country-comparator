@@ -6,6 +6,8 @@ Compare countries side by side. A mobile-first web app meant to be pulled up on 
 
 Status: early prototype with real data for 201 countries and territories.
 
+It installs as an app: open the site, then pick **Add to Home Screen** from the browser's share menu (iPhone) or **Install app** from the browser menu (Android, desktop Chrome). After the first load it works offline, and new versions apply on their own.
+
 Every comparison is a link. The countries, metrics and their order live in the query string, for example `?countries=fr-ca&metrics=capital-currency`, so the URL in the address bar can be shared as is.
 
 ## Develop

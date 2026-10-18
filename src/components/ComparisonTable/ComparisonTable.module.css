@@ -111,9 +111,7 @@
   align-items: center;
   justify-content: center;
   align-self: stretch;
-  background: var(--color-bg-subtle);
-  border-left: 1px solid var(--color-border);
-  box-shadow: -8px 0 8px -8px rgba(0, 0, 0, 0.12);
+  background: var(--color-bg-subtle); /* same as the header, so the button floats */
 }
 
 .addColumnButton {
@@ -199,8 +197,9 @@
   hyphens: auto;
 }
 
-/* The lane continues down every row, pinned like the header's add cell,
-   so the right edge reads as one column. Row deletes live here while editing. */
+/* The lane continues down every row, pinned like the header's add cell.
+   It is transparent: row deletes float here while editing, and a dragged
+   column's tint shows through instead of being cut off by white boxes. */
 .lane {
   grid-column: -2 / -1;
   grid-row: 1 / -1;
@@ -210,9 +209,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg);
-  border-left: 1px solid var(--color-border);
-  box-shadow: -8px 0 8px -8px rgba(0, 0, 0, 0.12);
 }
 
 /* ---------- Edit mode: delete buttons ---------- */
@@ -449,6 +445,7 @@
 
   .corner {
     background: var(--color-bg-subtle);
+    border-right: 0; /* blends into the header instead of boxing an empty cell */
   }
 
   .label {

@@ -1,6 +1,9 @@
 import { render, screen, within, fireEvent } from '@testing-library/react'
 import { afterEach, describe, it, expect } from 'vitest'
 import App from './App.jsx'
+import { DEFAULT_METRIC_KEYS } from './state/urlState.js'
+
+const DEFAULT_METRICS = DEFAULT_METRIC_KEYS.join('-')
 
 // Tests share one jsdom window; leave the URL clean for the next one
 afterEach(() => window.history.replaceState(null, '', '/'))
@@ -33,7 +36,7 @@ describe('App', () => {
 
   describe('URL state', () => {
     it('reads the comparison from the query string', () => {
-      window.history.replaceState(null, '', '/?c=fr,ca&m=capital,currency')
+      window.history.replaceState(null, '', '/?countries=fr-ca&metrics=capital-currency')
       render(<App />)
       const headers = screen.getAllByRole('columnheader').map((h) => h.textContent)
       expect(headers.filter((t) => t.includes('France') || t.includes('Canada'))).toHaveLength(2)
@@ -42,24 +45,35 @@ describe('App', () => {
       expect(document.title).toBe('France vs Canada · Country Comparator')
     })
 
-    it('writes changes back to the URL, omitting defaults', () => {
+    it('replaces the bare URL with the default comparison', () => {
       render(<App />)
-      expect(window.location.search).toBe('')
+      expect(window.location.search).toBe(`?countries=us-jp-de&metrics=${DEFAULT_METRICS}`)
+    })
+
+    it('writes changes back to the URL', () => {
+      render(<App />)
       fireEvent.click(button('Add country'))
       fireEvent.click(screen.getByRole('option', { name: /France/ }))
-      expect(window.location.search).toBe('?c=US,JP,DE,FR')
+      expect(window.location.search).toBe(`?countries=us-jp-de-fr&metrics=${DEFAULT_METRICS}`)
       fireEvent.click(button('Edit'))
       fireEvent.click(button('Remove Population'))
-      expect(window.location.search).toMatch(/^\?c=US,JP,DE,FR&m=area_sq_mi,/)
+      expect(window.location.search).toMatch(/^\?countries=us-jp-de-fr&metrics=area_sq_mi-/)
       expect(window.location.search).not.toContain('population')
     })
 
     it('ignores junk in the URL and falls back to the defaults', () => {
-      window.history.replaceState(null, '', '/?c=XX,YY&m=nothing')
+      window.history.replaceState(null, '', '/?countries=xx-yy&metrics=nothing')
       render(<App />)
       expect(screen.getByRole('columnheader', { name: /Japan/ })).toBeInTheDocument()
       expect(screen.getByText('Population')).toBeInTheDocument()
-      expect(window.location.search).toBe('')
+      expect(window.location.search).toBe(`?countries=us-jp-de&metrics=${DEFAULT_METRICS}`)
+    })
+
+    it('still opens links in the earlier short format', () => {
+      window.history.replaceState(null, '', '/?c=FR,CA&m=capital,currency')
+      render(<App />)
+      expect(screen.getByRole('columnheader', { name: /France/ })).toBeInTheDocument()
+      expect(window.location.search).toBe('?countries=fr-ca&metrics=capital-currency')
     })
   })
 

@@ -146,8 +146,12 @@
 /* ---------- Metric rows ---------- */
 
 .label {
-  grid-column: 1 / -2;
+  grid-column: 1 / -1;
   grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
   min-width: 0;
   margin-bottom: var(--space-1);
   font-size: 0.75rem;
@@ -229,6 +233,56 @@
 .removeRow {
   margin-right: var(--space-2);
   vertical-align: middle;
+}
+
+/* ---------- Edit mode: drag handles and the row being dragged ---------- */
+
+.dragHandle {
+  position: sticky;
+  right: var(--pane-pad);
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: -6px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--gray-400);
+  cursor: grab;
+  touch-action: none; /* the handle drags; the rest of the row still scrolls */
+}
+
+/* 44px touch target around a 28px handle */
+.dragHandle::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+.dragHandle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.dragHandle:hover,
+.dragHandle:focus-visible {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-muted);
+}
+
+.dragHandle:active,
+.row[data-dragging] .dragHandle {
+  cursor: grabbing;
+}
+
+.row[data-dragging] {
+  z-index: 2;
+  background: var(--color-bg);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
 }
 
 /* ---------- Toolbar row: add metric + edit (pinned bottom) ---------- */
@@ -335,7 +389,7 @@
     grid-row: 1;
     position: sticky;
     left: var(--pane-left);
-    z-index: 2;
+    z-index: 1;
     display: block;
     margin: 0;
     padding: 0 var(--space-4) 0 var(--pane-pad);
@@ -353,6 +407,11 @@
     align-items: center;
     background: var(--color-bg);
     font-size: var(--font-size-sm);
+  }
+
+  .dragHandle {
+    position: relative;
+    right: auto;
   }
 
   .labelText {

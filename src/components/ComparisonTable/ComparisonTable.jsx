@@ -95,29 +95,18 @@ function MetricRow({ metric, countries, editing, canRemove, onRemove }) {
         <span className={styles.labelText}>
           {editing && (
             <button
+              ref={setActivatorNodeRef}
               type="button"
-              className={`${styles.removeButton} ${styles.removeRow}`}
-              onClick={() => onRemove(metric.key)}
-              disabled={!canRemove}
-              aria-label={`Remove ${metric.label}`}
+              className={`${styles.handle} ${styles.rowHandle}`}
+              aria-label={`Reorder ${metric.label}`}
+              {...attributes}
+              {...listeners}
             >
-              <RemoveIcon />
+              <GripIcon />
             </button>
           )}
           {metric.label}
         </span>
-        {editing && (
-          <button
-            ref={setActivatorNodeRef}
-            type="button"
-            className={`${styles.handle} ${styles.rowHandle}`}
-            aria-label={`Reorder ${metric.label}`}
-            {...attributes}
-            {...listeners}
-          >
-            <GripIcon />
-          </button>
-        )}
       </div>
       {countries.map((country, i) => (
         <div
@@ -135,6 +124,20 @@ function MetricRow({ metric, countries, editing, canRemove, onRemove }) {
           {metric.format(country.metrics[metric.key])}
         </div>
       ))}
+      {/* The add-country lane continues down every row; it holds the delete button while editing */}
+      <div className={styles.lane} role="cell" aria-hidden={editing ? undefined : true}>
+        {editing && (
+          <button
+            type="button"
+            className={styles.removeButton}
+            onClick={() => onRemove(metric.key)}
+            disabled={!canRemove}
+            aria-label={`Remove ${metric.label}`}
+          >
+            <RemoveIcon />
+          </button>
+        )}
+      </div>
     </div>
   )
 }

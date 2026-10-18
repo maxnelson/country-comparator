@@ -7,9 +7,13 @@
    when they don't the table is wider than the viewport and the page's
    scroll container scrolls sideways. Everything "pinned" is position:
    sticky against that scroll container: the header row (top), metric
-   labels (left), the add-country cell (right), the add-metric row
+   labels (left), the add-country lane (right), the toolbar row
    (bottom). Nothing between the scroller and this table may set
    overflow other than visible or clip, or the pinning stops working.
+
+   Vertical padding lives in the cells, not the rows, so pinned cells
+   (label column, add lane) span a row's full height and their borders
+   run unbroken. Rows carry only the left gutter.
 
    Phones: a metric label spans the row above its values (grid row 1),
    values sit on grid row 2. 768px and up: labels get their own column.
@@ -18,11 +22,12 @@
 
 .table {
   --col-min: 96px; /* floor for a value column; content can make it wider */
-  --add-col: 56px;
+  --add-col: 48px; /* the add-country lane on the right */
   --value-col-start: 0; /* value i lands in column (start + i) */
   --value-row: 2;
   --pane-left: 0px; /* where sticky-left cells pin */
-  --pane-pad: var(--space-3); /* text inset inside pinned cells */
+  --pane-pad: var(--layout-gutter); /* text inset inside pinned cells; matches the header text */
+  --row-pad-y: var(--space-3);
   --value-size: 0.9375rem;
   --flag-size: 1.75rem;
 
@@ -44,7 +49,7 @@
   grid-template-columns: subgrid;
   grid-column: 1 / -1;
   grid-template-rows: auto auto;
-  padding: var(--space-3) 0;
+  padding: 0 0 0 var(--layout-gutter);
   border-top: 1px solid var(--color-border);
 }
 
@@ -77,8 +82,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-1);
-  min-width: 0;
-  padding: 0 var(--space-1);
+  padding: var(--row-pad-y) var(--space-1);
   text-align: center;
 }
 
@@ -95,7 +99,8 @@
   hyphens: auto;
 }
 
-/* Add-country cell: pinned to the right edge while the table scrolls */
+/* ---------- Add-country lane: its own pinned column at the right edge ---------- */
+
 .addColumnCell {
   grid-column: -2 / -1;
   grid-row: 1;
@@ -107,14 +112,17 @@
   justify-content: center;
   align-self: stretch;
   background: var(--color-bg-subtle);
+  border-left: 1px solid var(--color-border);
+  box-shadow: -8px 0 8px -8px rgba(0, 0, 0, 0.12);
 }
 
 .addColumnButton {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border: 0;
   border-radius: 50%;
   background: var(--color-brand-strong);
@@ -122,6 +130,13 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
   cursor: pointer;
   transition: background 0.15s, transform 0.15s;
+}
+
+/* 44px touch target around the 36px button */
+.addColumnButton::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
 }
 
 .addColumnButton:hover:not(:disabled) {
@@ -139,39 +154,40 @@
 }
 
 .plusIcon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 /* ---------- Metric rows ---------- */
 
 .label {
-  grid-column: 1 / -1;
+  grid-column: 1 / -2;
   grid-row: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
   min-width: 0;
+  padding-top: var(--row-pad-y);
   margin-bottom: var(--space-1);
   font-size: 0.75rem;
   line-height: 1.2;
   color: var(--color-text-muted);
 }
 
-/* On phones only the label text pins left, so it reads at the edge
+/* On phones only the label text pins left, so it reads at the gutter
    however far the row has scrolled */
 .labelText {
   position: sticky;
   left: var(--pane-pad);
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .value {
   grid-column: calc(var(--value-col-start) + var(--i));
   grid-row: var(--value-row);
   min-width: var(--col-min);
-  padding: 0 var(--space-1);
+  padding: 0 var(--space-1) var(--row-pad-y);
   text-align: center;
   font-size: var(--value-size);
   font-weight: 600;
@@ -183,29 +199,45 @@
   hyphens: auto;
 }
 
-/* ---------- Edit mode: remove buttons ---------- */
+/* The lane continues down every row, pinned like the header's add cell,
+   so the right edge reads as one column. Row deletes live here while editing. */
+.lane {
+  grid-column: -2 / -1;
+  grid-row: 1 / -1;
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  border-left: 1px solid var(--color-border);
+  box-shadow: -8px 0 8px -8px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------- Edit mode: delete buttons ---------- */
 
 .removeButton {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: var(--gray-400);
+  background: var(--color-danger);
   color: var(--color-text-inverse);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, transform 0.15s;
 }
 
-/* 44px touch target around a 22px button */
+/* 44px touch target around a 24px button */
 .removeButton::before {
   content: '';
   position: absolute;
-  inset: -11px;
+  inset: -10px;
 }
 
 .removeButton svg {
@@ -215,7 +247,11 @@
 
 .removeButton:hover:not(:disabled),
 .removeButton:focus-visible {
-  background: var(--color-danger);
+  background: var(--color-danger-strong);
+}
+
+.removeButton:active:not(:disabled) {
+  transform: scale(0.92);
 }
 
 .removeButton:disabled {
@@ -223,28 +259,23 @@
   cursor: default;
 }
 
-/* Sits just to the right of the flag, whatever the column width */
+/* Column delete: top-right of the flag */
 .removeColumn {
   position: absolute;
-  top: -4px;
+  top: calc(var(--row-pad-y) - 4px);
   left: calc(50% + var(--flag-size) * 0.5 + 6px);
 }
 
-.removeRow {
-  margin-right: var(--space-2);
-  vertical-align: middle;
-}
-
-/* ---------- Edit mode: drag handles and the row being dragged ---------- */
+/* ---------- Edit mode: drag handles and what is being dragged ---------- */
 
 .handle {
+  position: relative;
   flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 28px;
   height: 28px;
-  margin: -6px 0;
   padding: 0;
   border: 0;
   border-radius: 6px;
@@ -277,16 +308,15 @@
   cursor: grabbing;
 }
 
-/* Row handle: pinned to the right edge so it stays reachable on wide tables */
+/* Row handle: inline before the label text; the label pins, so it pins too */
 .rowHandle {
-  position: sticky;
-  right: var(--pane-pad);
+  margin: -6px 0;
 }
 
-/* Column handle: top-left of the flag, mirroring the remove button top-right */
+/* Column handle: top-left of the flag, mirroring the delete top-right */
 .columnHandle {
   position: absolute;
-  top: -4px;
+  top: calc(var(--row-pad-y) - 4px);
   right: calc(50% + var(--flag-size) * 0.5 + 6px);
 }
 
@@ -310,7 +340,7 @@
   bottom: 0;
   z-index: 3;
   grid-template-rows: auto;
-  padding: var(--space-2) 0;
+  padding: var(--space-2) 0 var(--space-2) var(--layout-gutter);
   background: var(--color-bg-subtle);
   background: color-mix(in srgb, var(--color-bg-subtle) 94%, transparent);
   backdrop-filter: blur(8px);
@@ -373,7 +403,7 @@
   color: var(--color-text-inverse);
 }
 
-/* ---------- Wide screens: card, label column, roomier type ---------- */
+/* ---------- Wide screens: label column, roomier type ---------- */
 
 @media (min-width: 768px) {
   .table {
@@ -381,7 +411,7 @@
     --add-col: 64px;
     --value-col-start: 1;
     --value-row: 1;
-    --pane-pad: var(--layout-gutter);
+    --row-pad-y: var(--space-4);
     --value-size: 1.25rem;
     --flag-size: 2.25rem;
     grid-template-columns:
@@ -393,14 +423,15 @@
   .row {
     grid-template-rows: auto;
     align-items: center;
-    padding: var(--space-4) 0;
+    padding: 0;
   }
 
-  .headerRow {
-    padding-top: var(--space-5);
-    padding-bottom: var(--space-5);
+  .headerCell {
+    padding: var(--space-5) var(--space-1);
   }
 
+  /* Pinned label column: stretches to the row's full height so its
+     right border runs unbroken down the table */
   .corner,
   .label {
     grid-column: 1;
@@ -408,32 +439,21 @@
     position: sticky;
     left: var(--pane-left);
     z-index: 1;
-    display: block;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
     margin: 0;
-    padding: 0 var(--space-4) 0 var(--pane-pad);
-    box-shadow: 1px 0 0 var(--color-border); /* divider that travels with the pinned column */
+    padding: var(--row-pad-y) var(--space-4) var(--row-pad-y) var(--pane-pad);
+    border-right: 1px solid var(--color-border);
   }
 
   .corner {
-    align-self: stretch;
     background: var(--color-bg-subtle);
   }
 
   .label {
-    align-self: stretch;
-    display: flex;
-    align-items: center;
     background: var(--color-bg);
     font-size: var(--font-size-sm);
-  }
-
-  .rowHandle {
-    position: relative;
-    right: auto;
-  }
-
-  .columnHandle {
-    top: -2px;
   }
 
   .labelText {
@@ -441,10 +461,29 @@
   }
 
   .value {
-    padding: 0 var(--space-2);
+    padding: var(--row-pad-y) var(--space-2);
   }
 
-  .removeColumn {
-    top: -2px;
+  .addColumnButton {
+    width: 44px;
+    height: 44px;
+  }
+
+  .addColumnButton::before {
+    inset: 0;
+  }
+
+  .plusIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .removeColumn,
+  .columnHandle {
+    top: calc(var(--space-5) - 2px);
+  }
+
+  .addRow {
+    padding: var(--space-2) 0;
   }
 }

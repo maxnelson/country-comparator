@@ -2,6 +2,9 @@ import { render, screen, within, fireEvent } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import App from './App.jsx'
 
+const search = (name) => screen.getByRole('combobox', { name })
+const button = (name) => screen.getByRole('button', { name })
+
 describe('App', () => {
   it('renders the default comparison', () => {
     render(<App />)
@@ -19,9 +22,15 @@ describe('App', () => {
     expect(within(row).getAllByRole('cell')).toHaveLength(3)
   })
 
+  it('keeps the toolbar row with Add metric as the last row', () => {
+    render(<App />)
+    const rows = screen.getAllByRole('row')
+    expect(within(rows.at(-1)).getByRole('button', { name: 'Add metric' })).toBeInTheDocument()
+  })
+
   describe('country picker', () => {
     const openPicker = () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Add country' }))
+      fireEvent.click(button('Add country'))
       return screen.getByRole('dialog', { name: 'Add a country' })
     }
 
@@ -36,9 +45,7 @@ describe('App', () => {
     it('filters as you type and adds the chosen country', () => {
       render(<App />)
       const dialog = openPicker()
-      fireEvent.change(screen.getByRole('combobox', { name: 'Search countries' }), {
-        target: { value: 'fr' },
-      })
+      fireEvent.change(search('Search countries'), { target: { value: 'fr' } })
       expect(within(dialog).getAllByRole('option')).toHaveLength(1)
       fireEvent.click(within(dialog).getByRole('option', { name: /France/ }))
       expect(screen.getByRole('columnheader', { name: /France/ })).toBeInTheDocument()
@@ -48,19 +55,16 @@ describe('App', () => {
     it('finds a country by alias or code', () => {
       render(<App />)
       const dialog = openPicker()
-      const input = screen.getByRole('combobox', { name: 'Search countries' })
-      fireEvent.change(input, { target: { value: 'uk' } })
+      fireEvent.change(search('Search countries'), { target: { value: 'uk' } })
       expect(within(dialog).getByRole('option', { name: /United Kingdom/ })).toBeInTheDocument()
-      fireEvent.change(input, { target: { value: 'ca' } })
+      fireEvent.change(search('Search countries'), { target: { value: 'ca' } })
       expect(within(dialog).getByRole('option', { name: /Canada/ })).toBeInTheDocument()
     })
 
     it('shows an empty state when nothing matches', () => {
       render(<App />)
       const dialog = openPicker()
-      fireEvent.change(screen.getByRole('combobox', { name: 'Search countries' }), {
-        target: { value: 'zzz' },
-      })
+      fireEvent.change(search('Search countries'), { target: { value: 'zzz' } })
       expect(within(dialog).queryAllByRole('option')).toHaveLength(0)
       expect(within(dialog).getByText('No countries match')).toBeInTheDocument()
     })
@@ -68,24 +72,65 @@ describe('App', () => {
     it('adds the highlighted result with the keyboard', () => {
       render(<App />)
       openPicker()
-      const input = screen.getByRole('combobox', { name: 'Search countries' })
-      fireEvent.keyDown(input, { key: 'ArrowDown' })
-      fireEvent.keyDown(input, { key: 'Enter' })
+      fireEvent.keyDown(search('Search countries'), { key: 'ArrowDown' })
+      fireEvent.keyDown(search('Search countries'), { key: 'Enter' })
       // Remaining countries start Brazil, India; ArrowDown moved to India
       expect(screen.getByRole('columnheader', { name: /India/ })).toBeInTheDocument()
     })
   })
 
-  it('keeps the add-metric row as the last row', () => {
-    render(<App />)
-    const rows = screen.getAllByRole('row')
-    expect(within(rows.at(-1)).getByRole('button', { name: 'Add metric' })).toBeInTheDocument()
+  describe('metric picker', () => {
+    const openPicker = () => {
+      fireEvent.click(button('Add metric'))
+      return screen.getByRole('dialog', { name: 'Add a metric' })
+    }
+
+    it('lists only the metrics not yet shown', () => {
+      render(<App />)
+      const dialog = openPicker()
+      expect(within(dialog).getByRole('option', { name: /CO₂/ })).toBeInTheDocument()
+      expect(within(dialog).queryByRole('option', { name: /Population/ })).not.toBeInTheDocument()
+    })
+
+    it('adds the chosen metric as the last metric row', () => {
+      render(<App />)
+      const dialog = openPicker()
+      fireEvent.change(search('Search metrics'), { target: { value: 'tax' } })
+      fireEvent.click(within(dialog).getByRole('option', { name: /Top income tax rate/ }))
+      const rows = screen.getAllByRole('row')
+      expect(within(rows.at(-2)).getByText('Top income tax rate')).toBeInTheDocument()
+      expect(dialog).not.toHaveAttribute('open')
+    })
   })
 
-  it('reveals another metric when "Add metric" is pressed', () => {
-    render(<App />)
-    expect(screen.queryByText('CO₂ (tons / capita)')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Add metric' }))
-    expect(screen.getByText('CO₂ (tons / capita)')).toBeInTheDocument()
+  describe('edit mode', () => {
+    it('shows remove buttons only while editing', () => {
+      render(<App />)
+      expect(screen.queryByRole('button', { name: 'Remove Japan' })).not.toBeInTheDocument()
+      fireEvent.click(button('Edit'))
+      expect(button('Remove Japan')).toBeInTheDocument()
+      expect(button('Remove Population')).toBeInTheDocument()
+      fireEvent.click(button('Done'))
+      expect(screen.queryByRole('button', { name: 'Remove Japan' })).not.toBeInTheDocument()
+    })
+
+    it('removes a country and a metric, and offers them in the pickers again', () => {
+      render(<App />)
+      fireEvent.click(button('Edit'))
+      fireEvent.click(button('Remove Japan'))
+      expect(screen.queryByRole('columnheader', { name: /Japan/ })).not.toBeInTheDocument()
+      fireEvent.click(button('Remove Population'))
+      expect(screen.queryByText('Population')).not.toBeInTheDocument()
+      fireEvent.click(button('Add country'))
+      expect(screen.getByRole('option', { name: /Japan/ })).toBeInTheDocument()
+    })
+
+    it('keeps at least one country', () => {
+      render(<App />)
+      fireEvent.click(button('Edit'))
+      fireEvent.click(button('Remove Japan'))
+      fireEvent.click(button('Remove Germany'))
+      expect(button('Remove United States')).toBeDisabled()
+    })
   })
 })

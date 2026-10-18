@@ -5,6 +5,9 @@ import Picker from '../Picker/Picker.jsx'
 import styles from './ComparisonTable.module.css'
 
 const INITIAL_COUNTRY_CODES = ['US', 'JP', 'DE']
+const INITIAL_METRIC_KEYS = SAMPLE_METRICS.slice(0, DEFAULT_VISIBLE_METRIC_COUNT).map((m) => m.key)
+const MIN_COUNTRIES = 1
+const MIN_METRICS = 1
 
 function PlusIcon() {
   return (
@@ -14,23 +17,37 @@ function PlusIcon() {
   )
 }
 
+function RemoveIcon() {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+      <path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" fill="none" />
+    </svg>
+  )
+}
+
 function ComparisonTable() {
   const [activeCodes, setActiveCodes] = useState(INITIAL_COUNTRY_CODES)
-  const [visibleMetricCount, setVisibleMetricCount] = useState(DEFAULT_VISIBLE_METRIC_COUNT)
+  const [activeMetricKeys, setActiveMetricKeys] = useState(INITIAL_METRIC_KEYS)
+  const [editing, setEditing] = useState(false)
   const countryPickerRef = useRef(null)
+  const metricPickerRef = useRef(null)
   const addCountryButtonRef = useRef(null)
+  const addMetricButtonRef = useRef(null)
 
   const activeCountries = activeCodes
     .map((code) => SAMPLE_COUNTRIES.find((c) => c.code === code))
     .filter(Boolean)
+  const remainingCountries = SAMPLE_COUNTRIES.filter((c) => !activeCodes.includes(c.code))
 
-  const remainingCountries = SAMPLE_COUNTRIES.filter(
-    (c) => !activeCodes.includes(c.code),
-  )
+  const visibleMetrics = activeMetricKeys
+    .map((key) => SAMPLE_METRICS.find((m) => m.key === key))
+    .filter(Boolean)
+  const remainingMetrics = SAMPLE_METRICS.filter((m) => !activeMetricKeys.includes(m.key))
 
-  const visibleMetrics = SAMPLE_METRICS.slice(0, visibleMetricCount)
   const canAddCountry = remainingCountries.length > 0
-  const canAddMetric = visibleMetricCount < SAMPLE_METRICS.length
+  const canAddMetric = remainingMetrics.length > 0
+  const canRemoveCountry = activeCountries.length > MIN_COUNTRIES
+  const canRemoveMetric = visibleMetrics.length > MIN_METRICS
 
   const countryPickerItems = remainingCountries.map((c) => ({
     id: c.code,
@@ -39,24 +56,22 @@ function ComparisonTable() {
     hint: c.code,
     keywords: [c.code, ...(c.aliases ?? [])],
   }))
+  const metricPickerItems = remainingMetrics.map((m) => ({ id: m.key, label: m.label }))
 
-  const openCountryPicker = () => {
-    countryPickerRef.current?.open(addCountryButtonRef.current)
-  }
-
-  const handleSelectCountry = (item) => {
+  const addCountry = (item) =>
     setActiveCodes((prev) => (prev.includes(item.id) ? prev : [...prev, item.id]))
-  }
-
-  // Until the metric picker ships (next roadmap step), "add" appends the next metric.
-  const handleAddMetric = () => {
-    setVisibleMetricCount((n) => Math.min(n + 1, SAMPLE_METRICS.length))
-  }
+  const removeCountry = (code) =>
+    setActiveCodes((prev) => (prev.length > MIN_COUNTRIES ? prev.filter((c) => c !== code) : prev))
+  const addMetric = (item) =>
+    setActiveMetricKeys((prev) => (prev.includes(item.id) ? prev : [...prev, item.id]))
+  const removeMetric = (key) =>
+    setActiveMetricKeys((prev) => (prev.length > MIN_METRICS ? prev.filter((k) => k !== key) : prev))
 
   return (
     <section
       className={styles.table}
       style={{ '--col-count': activeCountries.length }}
+      data-editing={editing || undefined}
       role="table"
       aria-label="Country comparison"
     >
@@ -74,6 +89,17 @@ function ComparisonTable() {
               {country.flag}
             </span>
             <span className={styles.countryName}>{country.name}</span>
+            {editing && (
+              <button
+                type="button"
+                className={`${styles.removeButton} ${styles.removeColumn}`}
+                onClick={() => removeCountry(country.code)}
+                disabled={!canRemoveCountry}
+                aria-label={`Remove ${country.name}`}
+              >
+                <RemoveIcon />
+              </button>
+            )}
           </div>
         ))}
         <div className={styles.addColumnCell} role="columnheader">
@@ -81,7 +107,7 @@ function ComparisonTable() {
             ref={addCountryButtonRef}
             type="button"
             className={styles.addColumnButton}
-            onClick={openCountryPicker}
+            onClick={() => countryPickerRef.current?.open(addCountryButtonRef.current)}
             disabled={!canAddCountry}
             aria-label="Add country"
             title="Add country"
@@ -95,7 +121,20 @@ function ComparisonTable() {
       {visibleMetrics.map((metric) => (
         <div key={metric.key} className={styles.row} role="row">
           <div className={styles.label} role="rowheader">
-            <span className={styles.labelText}>{metric.label}</span>
+            <span className={styles.labelText}>
+              {editing && (
+                <button
+                  type="button"
+                  className={`${styles.removeButton} ${styles.removeRow}`}
+                  onClick={() => removeMetric(metric.key)}
+                  disabled={!canRemoveMetric}
+                  aria-label={`Remove ${metric.label}`}
+                >
+                  <RemoveIcon />
+                </button>
+              )}
+              {metric.label}
+            </span>
           </div>
           {activeCountries.map((country, i) => (
             <div
@@ -110,16 +149,28 @@ function ComparisonTable() {
         </div>
       ))}
 
-      {/* Add-metric row: always the last row, pinned to the bottom */}
-      {canAddMetric && (
-        <div className={`${styles.row} ${styles.addRow}`} role="row">
-          <div className={styles.addRowCell} role="cell">
-            <button type="button" className={styles.addRowButton} onClick={handleAddMetric}>
-              <PlusIcon /> Add metric
-            </button>
-          </div>
+      {/* Toolbar row: always the last row, pinned to the bottom */}
+      <div className={`${styles.row} ${styles.addRow}`} role="row">
+        <div className={styles.addRowCell} role="cell">
+          <button
+            ref={addMetricButtonRef}
+            type="button"
+            className={styles.addRowButton}
+            onClick={() => metricPickerRef.current?.open(addMetricButtonRef.current)}
+            disabled={!canAddMetric}
+          >
+            <PlusIcon /> Add metric
+          </button>
+          <button
+            type="button"
+            className={editing ? `${styles.editButton} ${styles.editing}` : styles.editButton}
+            onClick={() => setEditing((e) => !e)}
+            aria-pressed={editing}
+          >
+            {editing ? 'Done' : 'Edit'}
+          </button>
         </div>
-      )}
+      </div>
 
       <Picker
         ref={countryPickerRef}
@@ -127,7 +178,15 @@ function ComparisonTable() {
         placeholder="Search countries"
         emptyMessage="No countries match"
         items={countryPickerItems}
-        onSelect={handleSelectCountry}
+        onSelect={addCountry}
+      />
+      <Picker
+        ref={metricPickerRef}
+        title="Add a metric"
+        placeholder="Search metrics"
+        emptyMessage="No metrics match"
+        items={metricPickerItems}
+        onSelect={addMetric}
       />
     </section>
   )

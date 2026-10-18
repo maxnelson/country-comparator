@@ -53,8 +53,9 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 
 - [x] Frozen-panes table: horizontal scroll with minimum column widths; flag header row pinned top, metric labels pinned left, add-country button pinned top-right, add-metric row pinned bottom. One scroll container for the whole page; header and footer stay put sideways.
 - [x] Country picker: search input with an autocomplete list; bottom sheet on phones, popover on desktop; matches partial names, codes and aliases; arrow keys and Enter; replaces "add the next country"
-- [ ] Metric picker reusing the same component (lists the metrics not yet shown)
-- [ ] Edit mode: remove buttons and drag handles on rows and columns; drag to reorder rows (dnd-kit), then columns
+- [x] Metric picker reusing the same component (lists the metrics not yet shown)
+- [x] Edit mode: an Edit/Done toggle in the pinned bottom toolbar reveals remove buttons on columns and rows; at least one country and one metric stay
+- [ ] Drag to reorder rows in Edit mode (dnd-kit), then columns
 - [ ] Put the comparison state in the URL (countries, metrics, order) so any view is shareable
 - [ ] Highlight the best / worst value in each row
 - [ ] Sensible first-run and empty states

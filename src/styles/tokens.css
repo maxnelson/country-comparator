@@ -62,6 +62,7 @@
   --color-brand:        var(--mint-400);
   --color-brand-strong: var(--mint-600);
   --color-accent:       var(--teal-500);
+  --color-danger:       #DC2626;
 
   /* Header */
   --color-header-bg:   var(--teal-600);

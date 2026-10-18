@@ -71,6 +71,7 @@
 .headerCell {
   grid-column: calc(var(--value-col-start) + var(--i));
   grid-row: 1;
+  position: relative;
   min-width: var(--col-min);
   display: flex;
   flex-direction: column;
@@ -178,7 +179,59 @@
   hyphens: auto;
 }
 
-/* ---------- Add-metric row (pinned bottom) ---------- */
+/* ---------- Edit mode: remove buttons ---------- */
+
+.removeButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--gray-400);
+  color: var(--color-text-inverse);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+/* 44px touch target around a 22px button */
+.removeButton::before {
+  content: '';
+  position: absolute;
+  inset: -11px;
+}
+
+.removeButton svg {
+  width: 14px;
+  height: 14px;
+}
+
+.removeButton:hover:not(:disabled),
+.removeButton:focus-visible {
+  background: var(--color-danger);
+}
+
+.removeButton:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Sits just to the right of the flag, whatever the column width */
+.removeColumn {
+  position: absolute;
+  top: -4px;
+  left: calc(50% + var(--flag-size) * 0.5 + 6px);
+}
+
+.removeRow {
+  margin-right: var(--space-2);
+  vertical-align: middle;
+}
+
+/* ---------- Toolbar row: add metric + edit (pinned bottom) ---------- */
 
 .addRow {
   position: sticky;
@@ -194,13 +247,17 @@
 }
 
 .addRowCell {
-  grid-column: 1 / -2;
+  grid-column: 1 / -1;
   grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
-.addRowButton {
+.addRowButton,
+.editButton {
   position: sticky;
-  left: var(--pane-pad);
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
@@ -217,10 +274,31 @@
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.addRowButton:hover {
+.addRowButton {
+  left: var(--pane-pad);
+}
+
+.editButton {
+  right: var(--pane-pad);
+  padding: 0 var(--space-4);
+}
+
+.addRowButton:hover:not(:disabled),
+.editButton:hover:not(.editing) {
   background: var(--mint-50);
   border-color: var(--mint-300);
   color: var(--color-brand-strong);
+}
+
+.addRowButton:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.editing {
+  background: var(--color-brand-strong);
+  border-color: var(--color-brand-strong);
+  color: var(--color-text-inverse);
 }
 
 /* ---------- Wide screens: card, label column, roomier type ---------- */
@@ -285,14 +363,7 @@
     padding: 0 var(--space-2);
   }
 
-  .addRowCell {
-    grid-column: 1;
-    position: sticky;
-    left: var(--pane-left);
-    padding-left: var(--pane-pad);
-  }
-
-  .addRowButton {
-    position: static;
+  .removeColumn {
+    top: -2px;
   }
 }

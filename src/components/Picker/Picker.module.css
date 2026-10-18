@@ -207,11 +207,12 @@
   }
 
   .dialog[data-anchored] .panel {
-    top: var(--anchor-top);
-    right: var(--anchor-right);
-    left: auto;
+    top: var(--anchor-top, auto);
+    bottom: var(--anchor-bottom, auto);
+    left: var(--anchor-left, auto);
+    right: var(--anchor-right, auto);
     transform: none;
-    max-height: min(480px, calc(100vh - var(--anchor-top) - 24px));
+    max-height: var(--anchor-max-h, 480px);
   }
 
   .grabber {

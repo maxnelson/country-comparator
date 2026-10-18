@@ -12,6 +12,32 @@ import styles from './Picker.module.css'
  *
  * items: [{ id, label, leading?, hint?, keywords? }]
  */
+const POPOVER_WIDTH = 360
+const POPOVER_MAX_HEIGHT = 480
+const EDGE = 24
+const GAP = 8
+
+// Wide screens: open below the anchor when there is room, else above; align
+// to its left edge when there is room, else to its right edge.
+function placementFor(r) {
+  const vars = {}
+  if (r.left + POPOVER_WIDTH <= window.innerWidth - EDGE) {
+    vars['--anchor-left'] = `${Math.round(r.left)}px`
+  } else {
+    vars['--anchor-right'] = `${Math.round(window.innerWidth - r.right)}px`
+  }
+  const roomBelow = window.innerHeight - r.bottom - GAP - EDGE
+  const roomAbove = r.top - GAP - EDGE
+  if (roomBelow >= Math.min(POPOVER_MAX_HEIGHT, 320) || roomBelow >= roomAbove) {
+    vars['--anchor-top'] = `${Math.round(r.bottom + GAP)}px`
+    vars['--anchor-max-h'] = `${Math.round(Math.min(POPOVER_MAX_HEIGHT, roomBelow))}px`
+  } else {
+    vars['--anchor-bottom'] = `${Math.round(window.innerHeight - r.top + GAP)}px`
+    vars['--anchor-max-h'] = `${Math.round(Math.min(POPOVER_MAX_HEIGHT, roomAbove))}px`
+  }
+  return vars
+}
+
 function Picker({
   ref,
   title,
@@ -44,15 +70,7 @@ function Picker({
       open(anchorEl) {
         const dialog = dialogRef.current
         if (!dialog || dialog.hasAttribute('open')) return
-        if (anchorEl) {
-          const r = anchorEl.getBoundingClientRect()
-          setAnchor({
-            top: Math.round(r.bottom + 8),
-            right: Math.round(window.innerWidth - r.right),
-          })
-        } else {
-          setAnchor(null)
-        }
+        setAnchor(anchorEl ? placementFor(anchorEl.getBoundingClientRect()) : null)
         setQuery('')
         setActiveIndex(0)
         setIsOpen(true)
@@ -139,11 +157,7 @@ function Picker({
       aria-labelledby={titleId}
       onClick={handleDialogClick}
       data-anchored={anchor ? '' : undefined}
-      style={
-        anchor
-          ? { '--anchor-top': `${anchor.top}px`, '--anchor-right': `${anchor.right}px` }
-          : undefined
-      }
+      style={anchor ?? undefined}
     >
       <div className={styles.panel}>
         <div className={styles.grabber} aria-hidden="true" />

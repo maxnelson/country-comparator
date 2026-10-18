@@ -1,5 +1,5 @@
-import { SAMPLE_COUNTRIES } from '../data/sampleCountries.js'
-import { SAMPLE_METRICS, DEFAULT_VISIBLE_METRIC_COUNT } from '../data/sampleMetrics.js'
+import { COUNTRIES } from '../data/countries.js'
+import { METRICS, DEFAULT_VISIBLE_METRIC_COUNT } from '../data/metrics.js'
 
 // The comparison lives in the query string so any view is a shareable link:
 //   ?countries=us-jp-de&metrics=population-gdp_usd
@@ -9,7 +9,7 @@ import { SAMPLE_METRICS, DEFAULT_VISIBLE_METRIC_COUNT } from '../data/sampleMetr
 // plus sign would decode as a space).
 
 export const DEFAULT_CODES = ['US', 'JP', 'DE']
-export const DEFAULT_METRIC_KEYS = SAMPLE_METRICS.slice(0, DEFAULT_VISIBLE_METRIC_COUNT).map(
+export const DEFAULT_METRIC_KEYS = METRICS.slice(0, DEFAULT_VISIBLE_METRIC_COUNT).map(
   (m) => m.key,
 )
 
@@ -21,8 +21,8 @@ const LEGACY_METRIC_PARAM = 'm'
 const SEPARATOR = '-'
 const SPLIT = /[-,]/
 
-const VALID_CODES = new Set(SAMPLE_COUNTRIES.map((c) => c.code))
-const VALID_METRIC_KEYS = new Set(SAMPLE_METRICS.map((m) => m.key))
+const VALID_CODES = new Set(COUNTRIES.map((c) => c.code))
+const VALID_METRIC_KEYS = new Set(METRICS.map((m) => m.key))
 
 // Keeps known ids in the order given, without duplicates; null when none survive.
 function parseList(value, valid, normalize) {
@@ -62,7 +62,7 @@ export function buildSearch({ codes, metricKeys }) {
   return `?${COUNTRY_PARAM}=${countries}&${METRIC_PARAM}=${metrics}`
 }
 
-const nameOf = (code) => SAMPLE_COUNTRIES.find((c) => c.code === code)?.name ?? code
+const nameOf = (code) => COUNTRIES.find((c) => c.code === code)?.name ?? code
 
 export function titleFor(codes) {
   const names = codes.map(nameOf)

@@ -21,8 +21,8 @@ import {
   restrictToVerticalAxis,
 } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
-import { SAMPLE_COUNTRIES } from '../../data/sampleCountries.js'
-import { SAMPLE_METRICS } from '../../data/sampleMetrics.js'
+import { COUNTRIES } from '../../data/countries.js'
+import { METRICS, metricValue } from '../../data/metrics.js'
 import Picker from '../Picker/Picker.jsx'
 import { buildSearch, parseSearch, titleFor } from '../../state/urlState.js'
 import { moveItem } from './reorder.js'
@@ -31,8 +31,8 @@ import styles from './ComparisonTable.module.css'
 const MIN_COUNTRIES = 1
 const MIN_METRICS = 1
 
-const metricLabel = (key) => SAMPLE_METRICS.find((m) => m.key === key)?.label ?? key
-const countryName = (code) => SAMPLE_COUNTRIES.find((c) => c.code === code)?.name ?? code
+const metricLabel = (key) => METRICS.find((m) => m.key === key)?.label ?? key
+const countryName = (code) => COUNTRIES.find((c) => c.code === code)?.name ?? code
 
 // Screen-reader announcements for drag and drop, using names instead of ids
 const announcementsFor = (nameOf, kind) => ({
@@ -121,7 +121,7 @@ function MetricRow({ metric, countries, editing, canRemove, onRemove }) {
           }}
           role="cell"
         >
-          {metric.format(country.metrics[metric.key])}
+          {metric.format(metricValue(metric, country))}
         </div>
       ))}
       {/* The add-country lane continues down every row; it holds the delete button while editing */}
@@ -246,14 +246,14 @@ function ComparisonTable() {
   )
 
   const activeCountries = activeCodes
-    .map((code) => SAMPLE_COUNTRIES.find((c) => c.code === code))
+    .map((code) => COUNTRIES.find((c) => c.code === code))
     .filter(Boolean)
-  const remainingCountries = SAMPLE_COUNTRIES.filter((c) => !activeCodes.includes(c.code))
+  const remainingCountries = COUNTRIES.filter((c) => !activeCodes.includes(c.code))
 
   const visibleMetrics = activeMetricKeys
-    .map((key) => SAMPLE_METRICS.find((m) => m.key === key))
+    .map((key) => METRICS.find((m) => m.key === key))
     .filter(Boolean)
-  const remainingMetrics = SAMPLE_METRICS.filter((m) => !activeMetricKeys.includes(m.key))
+  const remainingMetrics = METRICS.filter((m) => !activeMetricKeys.includes(m.key))
 
   const canAddCountry = remainingCountries.length > 0
   const canAddMetric = remainingMetrics.length > 0
@@ -265,7 +265,7 @@ function ComparisonTable() {
     label: c.name,
     leading: c.flag,
     hint: c.code,
-    keywords: [c.code, ...(c.aliases ?? [])],
+    keywords: [c.code, c.code3, ...(c.aliases ?? [])],
   }))
   const metricPickerItems = remainingMetrics.map((m) => ({ id: m.key, label: m.label }))
 

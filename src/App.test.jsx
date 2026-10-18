@@ -91,11 +91,11 @@ describe('App', () => {
       expect(within(dialog).queryByRole('option', { name: /Japan/ })).not.toBeInTheDocument()
     })
 
-    it('filters as you type and adds the chosen country', () => {
+    it('filters as you type, best match first, and adds the chosen country', () => {
       render(<App />)
       const dialog = openPicker()
       fireEvent.change(search('Search countries'), { target: { value: 'fr' } })
-      expect(within(dialog).getAllByRole('option')).toHaveLength(1)
+      expect(within(dialog).getAllByRole('option')[0]).toHaveTextContent('France')
       fireEvent.click(within(dialog).getByRole('option', { name: /France/ }))
       expect(screen.getByRole('columnheader', { name: /France/ })).toBeInTheDocument()
       expect(dialog).not.toHaveAttribute('open')
@@ -123,8 +123,8 @@ describe('App', () => {
       openPicker()
       fireEvent.keyDown(search('Search countries'), { key: 'ArrowDown' })
       fireEvent.keyDown(search('Search countries'), { key: 'Enter' })
-      // Remaining countries start Brazil, India; ArrowDown moved to India
-      expect(screen.getByRole('columnheader', { name: /India/ })).toBeInTheDocument()
+      // Countries list alphabetically: Afghanistan, Albania; ArrowDown moved to Albania
+      expect(screen.getByRole('columnheader', { name: /Albania/ })).toBeInTheDocument()
     })
   })
 
@@ -144,10 +144,10 @@ describe('App', () => {
     it('adds the chosen metric as the last metric row', () => {
       render(<App />)
       const dialog = openPicker()
-      fireEvent.change(search('Search metrics'), { target: { value: 'tax' } })
-      fireEvent.click(within(dialog).getByRole('option', { name: /Top income tax rate/ }))
+      fireEvent.change(search('Search metrics'), { target: { value: 'lit' } })
+      fireEvent.click(within(dialog).getByRole('option', { name: /Literacy rate/ }))
       const rows = screen.getAllByRole('row')
-      expect(within(rows.at(-2)).getByText('Top income tax rate')).toBeInTheDocument()
+      expect(within(rows.at(-2)).getByText('Literacy rate')).toBeInTheDocument()
       expect(dialog).not.toHaveAttribute('open')
     })
   })
@@ -179,7 +179,7 @@ describe('App', () => {
       expect(screen.queryByRole('button', { name: 'Reorder Population' })).not.toBeInTheDocument()
       fireEvent.click(button('Edit'))
       const handles = screen.getAllByRole('button', { name: /^Reorder / })
-      expect(handles).toHaveLength(12 + 3)
+      expect(handles).toHaveLength(10 + 3)
       expect(button('Reorder Population')).toHaveAttribute('aria-roledescription', 'sortable')
       expect(button('Reorder Japan')).toHaveAttribute('aria-roledescription', 'sortable')
     })

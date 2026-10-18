@@ -26,7 +26,7 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 | D1 | **Platform:** mobile-first Progressive Web App (PWA) built from the existing React + Vite app. Native app versions may follow later and will build on the finished web app. | Confirmed 2026-10-16 | Alternatives evaluated: native Swift, React Native / Expo. See *Platform evaluation* below. |
 | D2 | **Hosting:** static deploy on every push to `main` via GitHub Actions. Recommended: GitHub Pages to start (no new accounts; one toggle in repo settings), moving to Cloudflare Pages or Firebase Hosting when the app launches publicly or needs branch previews. Retire the App Engine config. | Confirmed 2026-10-16 | Live at https://maxnelson.github.io/country-comparator/. The app is a static site after `vite build`, so any static host works and switching later is cheap. See *Hosting evaluation* below. |
 | D3 | **Branching:** work directly on `main`. CI runs on every push. Branches only when the owner asks for one or when more than one person is working in the repo. | Confirmed 2026-10-16 | Solo project; PR overhead is not worth it from a phone. |
-| D5 | **Data:** ships as a committed JSON built by `npm run data:refresh` (no runtime fetching), from the World Bank Indicators API (CC BY 4.0) for numbers and mledoze/countries (ODbL 1.0) for the catalog; CIA World Factbook (public domain) next for median age and coastline. Wikidata (CC0) is the fallback for the catalog if ODbL share-alike ever matters. | Confirmed 2026-10-18 | Dropped for now: public debt (World Bank series sparse and decades stale), tourist arrivals (series ends in the 2020 pandemic year), average temperature, UNESCO sites, top income tax rate (no clean source yet). |
+| D5 | **Data:** ships as a committed JSON built by `npm run data:refresh` (no runtime fetching), from the World Bank Indicators API (CC BY 4.0) for numbers and mledoze/countries (ODbL 1.0) for the catalog; CIA World Factbook (public domain) next for median age and coastline. Wikidata (CC0) is the fallback for the catalog if ODbL share-alike ever matters. The Factbook is a frozen archive since the CIA ended it in February 2026; its fields will need a living source eventually (UN World Population Prospects for median age and fertility). | Confirmed 2026-10-18 | Dropped for now: public debt (World Bank series sparse and decades stale), tourist arrivals (series ends in the 2020 pandemic year), average temperature, UNESCO sites, top income tax rate (no clean source yet). |
 | D4 | **Table interaction model:** frozen-panes grid (horizontal scroll with minimum column widths; pinned header row, label column, add-country button and add-metric row), search-based pickers in a bottom sheet / popover, and an Edit mode for remove and drag-reorder. | Confirmed 2026-10-17 | Owner's proposal, refined in discussion. Replaced the fit-to-width layout and compact-number tiers from Phase 1. |
 
 ---
@@ -59,7 +59,6 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 - [x] Drag to reorder rows in Edit mode (dnd-kit): grip handle at the right of each row, short hold on touch, keyboard with Space and arrows, auto-scroll near the edges
 - [x] Drag to reorder columns in Edit mode: grip at the top-left of each flag; the whole column (header and values) moves together
 - [x] Put the comparison state in the URL (countries, metrics, order) so any view is shareable: `?countries=fr-ca&metrics=capital-currency`; both parameters are always written, so the bare URL becomes the default comparison; the tab title names the countries
-- [ ] Highlight the best / worst value in each row
 - [ ] Sensible first-run and empty states
 
 ## Phase 3 — Real data (D5)
@@ -68,7 +67,7 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 - [x] Bundled build-time JSON, committed to the repo
 - [x] Data refresh script (`scripts/fetch-data.mjs`); every World Bank value carries the year it was reported for
 - [x] All 201 countries and territories (UN members, independents, plus Taiwan, Kosovo, Palestine, Hong Kong, Macao, Puerto Rico, Greenland)
-- [ ] CIA World Factbook (public domain) for median age and coastline, and any other metrics it covers well
+- [x] CIA World Factbook (public domain) for median age and coastline, plus urban population, fertility rate, infant mortality, physician density, highest point, airports, Gini index, inflation, GDP growth, military spending as % of GDP, electricity access and government type. The CIA stopped publishing it in February 2026, so these come from the final edition and will not refresh.
 - [ ] Show the data year somewhere discreet (values range from 2021 to 2025 depending on the series)
 - [ ] Methodology and Data Sources pages (currently dead footer links), with the attribution each license asks for
 - [ ] Monthly refresh via a scheduled GitHub Action that opens a commit when data changed
@@ -98,6 +97,7 @@ Add raw ideas here. They get sorted into a phase during planning.
 
 - Cap how wide value columns grow on very wide screens; with three countries on a 1920px display each column is over 500px.
 - The data JSON is bundled into the main script (about 32 KB gzipped). Lazy-load it if the bundle keeps growing.
+- Factbook-derived metrics are frozen at the final 2025/2026 edition. Replace median age and fertility with UN World Population Prospects (CC BY 3.0 IGO) when they start to feel stale.
 
 ---
 

@@ -4,17 +4,20 @@
 //            (data is stored in source units: km², USD)
 //   convert  display-unit conversion applied to the stored value
 //   format   display string; returns "—" for a missing value
-// Numeric metrics come from the World Bank; capital and currency from the
-// catalog. See scripts/fetch-data.mjs.
+// Numeric metrics come from the World Bank and the CIA World Factbook; capital
+// and currency from the catalog. See scripts/fetch-data.mjs.
 
 const compact = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 })
 const withCommas = (v) => Math.round(v).toLocaleString('en-US')
 const oneDecimal = (v) => v.toLocaleString('en-US', { maximumFractionDigits: 1 })
+const twoDecimals = (v) => v.toLocaleString('en-US', { maximumFractionDigits: 2 })
 const percent = (v) => oneDecimal(v) + '%'
 const fmt = (formatter) => (v) => (v === null || v === undefined ? '—' : formatter(v))
 
 const KM2_TO_SQ_MI = 0.386102
 const PER_KM2_TO_PER_SQ_MI = 2.58999
+const KM_TO_MI = 0.621371
+const M_TO_FT = 3.28084
 
 export const METRICS = [
   { key: 'population',       label: 'Population',               format: fmt(withCommas) },
@@ -28,9 +31,23 @@ export const METRICS = [
   { key: 'internet_pct',     label: 'Internet users',           format: fmt(percent) },
   { key: 'unemployment_pct', label: 'Unemployment',             format: fmt(percent) },
   // Below the fold by default; added via "Add metric"
-  { key: 'literacy_pct',        label: 'Literacy rate',          format: fmt(percent) },
-  { key: 'co2_per_capita',      label: 'CO₂ (tons / capita)',    format: fmt(oneDecimal) },
-  { key: 'military_spending_b', label: 'Military spending',      source: 'military_spending_usd', convert: (v) => v / 1e9, format: fmt((v) => '$' + oneDecimal(v) + 'B') },
+  { key: 'median_age',          label: 'Median age',                       format: fmt(oneDecimal) },
+  { key: 'literacy_pct',        label: 'Literacy rate',                    format: fmt(percent) },
+  { key: 'co2_per_capita',      label: 'CO₂ (tons / capita)',              format: fmt(oneDecimal) },
+  { key: 'military_spending_b', label: 'Military spending',                source: 'military_spending_usd', convert: (v) => v / 1e9, format: fmt((v) => '$' + oneDecimal(v) + 'B') },
+  { key: 'military_gdp_pct',    label: 'Military spending (% of GDP)',     format: fmt(percent) },
+  { key: 'gdp_growth_pct',      label: 'GDP growth',                       format: fmt(percent) },
+  { key: 'inflation_pct',       label: 'Inflation',                        format: fmt(percent) },
+  { key: 'gini',                label: 'Gini index (inequality)',          format: fmt(oneDecimal) },
+  { key: 'urban_pct',           label: 'Urban population',                 format: fmt(percent) },
+  { key: 'fertility_rate',      label: 'Fertility rate (births per woman)', format: fmt(twoDecimals) },
+  { key: 'infant_mortality',    label: 'Infant mortality (per 1,000 births)', format: fmt(oneDecimal) },
+  { key: 'physician_density',   label: 'Physicians (per 1,000 people)',    format: fmt(twoDecimals) },
+  { key: 'electricity_pct',     label: 'Electricity access',               format: fmt(percent) },
+  { key: 'coastline_mi',        label: 'Coastline (mi)',                   source: 'coastline_km', convert: (v) => v * KM_TO_MI, format: fmt(withCommas) },
+  { key: 'highest_point_ft',    label: 'Highest point (ft)',               source: 'highest_point_m', convert: (v) => v * M_TO_FT, format: fmt(withCommas) },
+  { key: 'airports',            label: 'Airports',                         format: fmt(withCommas) },
+  { key: 'government_type',     label: 'Government type',                  format: fmt((v) => v) },
 ]
 
 export const DEFAULT_VISIBLE_METRIC_COUNT = 10

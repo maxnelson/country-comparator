@@ -1,0 +1,37 @@
+.header {
+  position: sticky;
+  left: 0;
+  background: var(--color-header-bg);
+  color: var(--color-header-text);
+}
+
+.inner {
+  max-width: var(--layout-max-width);
+  margin: 0 auto;
+  padding: 0 var(--layout-gutter);
+  height: var(--layout-header-height);
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-header-text);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.logo:hover {
+  opacity: 0.85;
+}
+
+/* White rounded-bars mark, 20px tall (viewBox 248×300) */
+.mark {
+  display: block;
+  width: auto;
+  height: 20px;
+}

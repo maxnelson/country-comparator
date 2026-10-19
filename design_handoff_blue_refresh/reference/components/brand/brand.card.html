@@ -1,0 +1,32 @@
+<!-- @dsCard group="Components" viewport="700x170" name="Mark" -->
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="../../assets/ds-loader.js"></script>
+</head><body style="padding:24px;background:#fff;">
+<div id="root"></div>
+<script type="text/babel">
+ccLoad('../../').then((CC) => {
+  const { Icon, Button, IconButton, SearchInput, Picker, Mark, Header, Footer, ComparisonTable } = CC;
+  const Lbl = ({ children }) => <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }}>{children}</div>;
+  const C3 = [{ code: 'US', name: 'United States', flag: '🇺🇸' }, { code: 'JP', name: 'Japan', flag: '🇯🇵' }, { code: 'DE', name: 'Germany', flag: '🇩🇪' }];
+  const V = { population: ['341,784,857', '123,366,734', '83,491,249'], gdp_usd: ['$30.77T', '$4.44T', '$5.05T'], gdp_per_capita: ['$90,027', '$35,951', '$60,496'], life_expectancy: ['78.9', '84', '80.8'], capital: ['Washington D.C.', 'Tokyo', 'Berlin'] };
+  const M = [{ key: 'population', label: 'Population' }, { key: 'gdp_usd', label: 'GDP' }, { key: 'gdp_per_capita', label: 'GDP per capita' }, { key: 'life_expectancy', label: 'Life expectancy (years)' }, { key: 'capital', label: 'Capital' }];
+  const get = (m, c) => V[m.key][C3.findIndex((x) => x.code === c.code)];
+  function Demo() {
+
+    return (
+      <div style={{ display: 'flex', gap: 28, alignItems: 'flex-end' }}>
+        <Mark size={96} title="Country Comparator" /><Mark size={48} /><Mark size={32} /><Mark size={16} />
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '12px 16px', background: 'var(--color-header-bg)', color: '#fff', borderRadius: 10, fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em' }}><Mark variant="bars" size={20} color="#fff" />Country Comparator</div>
+        <Mark variant="bars" size={40} />
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+});
+</script>
+</body></html>

@@ -1,0 +1,125 @@
+:root {
+  /* ============================================================
+     Palette — raw color scales
+     ============================================================ */
+
+  /* Blue — brand. OKLCH ramp (hue 255, peak chroma 0.15) on the same
+     lightness steps the old mint ramp used. blue-700 is the anchor. */
+  --blue-50:  #F4F8FE;
+  --blue-100: #E4EFFE;
+  --blue-200: #CAE0FD;
+  --blue-300: #B1D2FE;
+  --blue-400: #98C4FD;
+  --blue-500: #59A0F9;
+  --blue-600: #3D84DB;
+  --blue-700: #2569B8; /* brand anchor: header, primary fills, mark */
+  --blue-800: #124F93;
+  --blue-900: #06376C;
+
+  /* Gray — neutral scale (cool/zinc) */
+  --gray-50:  #FAFAFA;
+  --gray-100: #F4F4F5;
+  --gray-200: #E4E4E7;
+  --gray-300: #D4D4D8;
+  --gray-400: #A1A1AA;
+  --gray-500: #71717A;
+  --gray-600: #52525B;
+  --gray-700: #3F3F46;
+  --gray-800: #27272A;
+  --gray-900: #18181B;
+
+  /* Red — destructive only */
+  --red-600: #DC2626;
+  --red-700: #B91C1C;
+
+  /* ============================================================
+     Semantic tokens — reference palette above
+     Change these to re-theme; leave palette alone.
+     Components must use these, never --blue-* / --gray-* directly.
+     ============================================================ */
+
+  /* Text */
+  --color-text:         var(--gray-900);
+  --color-text-muted:   var(--gray-500);
+  --color-text-inverse: #ffffff;
+
+  /* Surfaces */
+  --color-bg:            #ffffff;
+  --color-bg-subtle:     var(--gray-50);
+  --color-border:        var(--gray-200);
+  --color-border-strong: var(--gray-300);
+
+  /* Links */
+  --color-link:       var(--gray-900);
+  --color-link-hover: var(--blue-700);
+
+  /* Brand */
+  --color-brand:             var(--blue-400);
+  --color-brand-strong:      var(--blue-700); /* was mint-600; now passes 4.5:1 with white */
+  --color-brand-stronger:    var(--blue-800); /* hover / pressed on brand-strong */
+  --color-brand-tint:        var(--blue-50);  /* hover fill, active option, dragged column */
+  --color-brand-tint-border: var(--blue-300);
+  --color-accent:            var(--blue-500); /* focus rings */
+  --color-danger:            var(--red-600);
+  --color-danger-strong:     var(--red-700);
+
+  /* Header */
+  --color-header-bg:   var(--blue-700);
+  --color-header-text: var(--color-text-inverse);
+
+  /* Controls & overlays */
+  --color-handle:         var(--gray-400);
+  --color-disabled-fill:  var(--gray-300);
+  --color-grabber:        var(--gray-300);
+  --color-backdrop:       rgba(24, 24, 27, 0.4);
+  --color-backdrop-light: rgba(24, 24, 27, 0.12);
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+
+  /* Radii */
+  --radius-sm:   6px;   /* drag handles */
+  --radius-md:   10px;  /* buttons, inputs, picker options, dragged header cell */
+  --radius-lg:   12px;  /* desktop popover */
+  --radius-xl:   16px;  /* phone sheet top corners */
+  --radius-full: 999px; /* round icon buttons */
+
+  /* Elevation */
+  --shadow-sm:    0 1px 2px rgba(0, 0, 0, 0.18);
+  --shadow-md:    0 6px 20px rgba(0, 0, 0, 0.16);
+  --shadow-lg:    0 12px 32px rgba(0, 0, 0, 0.16);
+  --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.18);
+
+  /* Motion */
+  --duration-fast:    0.15s;
+  --duration-sheet:   0.2s;
+  --duration-popover: 0.12s;
+
+  /* Typography */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+
+  /* Layout (mobile-first; widened below for larger screens) */
+  --layout-max-width: none; /* full width: the table uses every pixel it can get */
+  --layout-header-height: 56px;
+  --layout-gutter: 1rem;
+  --layout-breakpoint-md: 768px; /* documentation only: media queries cannot read custom properties */
+  --touch-target: 44px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --layout-header-height: 64px;
+    --layout-gutter: 1.5rem;
+  }
+}

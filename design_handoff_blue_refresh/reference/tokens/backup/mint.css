@@ -1,0 +1,25 @@
+/* BACKUP palette — not imported by styles.css.
+   The original mint ramp from src/styles/tokens.css, with the unified
+   semantic mapping explored in Foundations Explorations (1d / 1i).
+   To switch back: import this file after tokens/colors.css. */
+:root {
+  --mint-50:  #EFFAF3;
+  --mint-100: #D7F3E0;
+  --mint-200: #AEE6C2;
+  --mint-300: #92DCAC;
+  --mint-400: #7BD39B;
+  --mint-500: #4FB678;
+  --mint-600: #34995F;
+  --mint-700: #277A4B;
+  --mint-800: #1F5B38;
+  --mint-900: #173F27;
+
+  --color-link-hover:        var(--mint-700);
+  --color-brand:             var(--mint-400);
+  --color-brand-strong:      var(--mint-700);
+  --color-brand-stronger:    var(--mint-800);
+  --color-brand-tint:        var(--mint-50);
+  --color-brand-tint-border: var(--mint-300);
+  --color-accent:            var(--mint-500);
+  --color-header-bg:         var(--mint-700);
+}

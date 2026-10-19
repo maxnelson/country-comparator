@@ -1,0 +1,49 @@
+/* Country Comparator — spacing, radii, elevation, layout, motion. */
+:root {
+  --space-1: 0.25rem; /* 4 */
+  --space-2: 0.5rem;  /* 8 */
+  --space-3: 0.75rem; /* 12 */
+  --space-4: 1rem;    /* 16 */
+  --space-5: 1.5rem;  /* 24 */
+  --space-6: 2rem;    /* 32 */
+  --space-8: 3rem;    /* 48 */
+
+  --radius-sm:   6px;   /* drag handles */
+  --radius-md:   10px;  /* buttons, inputs, picker options, dragged header cell */
+  --radius-lg:   12px;  /* desktop popover */
+  --radius-xl:   16px;  /* phone bottom sheet (top corners) */
+  --radius-full: 999px; /* round icon buttons */
+  --radius-icon: 21.875%; /* app icon squircle-ish corner (112/512) */
+
+  --shadow-sm:    0 1px 2px rgba(0, 0, 0, 0.18);   /* add-country button */
+  --shadow-md:    0 6px 20px rgba(0, 0, 0, 0.16);  /* dragged row / column */
+  --shadow-lg:    0 12px 32px rgba(0, 0, 0, 0.16); /* popover */
+  --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.18); /* bottom sheet */
+
+  --touch-target: 44px;
+
+  --layout-max-width: none;
+  --layout-header-height: 56px;
+  --layout-gutter: 1rem;
+  --layout-breakpoint-md: 768px; /* documentation only */
+
+  --table-col-min: 96px;
+  --table-add-col: 48px;
+  --table-label-col: 220px; /* 768px+ only */
+  --table-row-pad-y: var(--space-3);
+
+  --duration-fast: 0.15s;   /* hover, press */
+  --duration-sheet: 0.2s;   /* sheet slide-up, ease-out */
+  --duration-popover: 0.12s; /* popover fade, ease-out */
+  --press-scale: 0.94;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --layout-header-height: 64px;
+    --layout-gutter: 1.5rem;
+    --table-col-min: 160px;
+    --table-add-col: 64px;
+    --table-row-pad-y: var(--space-4);
+  }
+}

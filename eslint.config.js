@@ -5,7 +5,8 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // Design handoffs hold reference mockups, not app code
+  globalIgnores(['dist', 'design_handoff_*']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [

@@ -207,4 +207,33 @@ describe('App', () => {
       expect(button('Remove United States')).toBeDisabled()
     })
   })
+
+  describe('info pages', () => {
+    it('opens Methodology from the footer link instead of the comparison', () => {
+      const { unmount } = render(<App />)
+      const link = screen.getByRole('link', { name: 'Methodology' })
+      expect(link).toHaveAttribute('href', '/?page=methodology')
+      unmount()
+
+      window.history.replaceState(null, '', link.getAttribute('href'))
+      render(<App />)
+      expect(screen.getByRole('heading', { level: 1, name: 'Methodology' })).toBeInTheDocument()
+      expect(screen.queryByRole('table', { name: 'Country comparison' })).not.toBeInTheDocument()
+      expect(screen.getByRole('cell', { name: 'Population' })).toBeInTheDocument()
+      expect(document.title).toBe('Methodology · Country Comparator')
+      // The page is not a comparison, so its URL is left alone
+      expect(window.location.search).toBe('?page=methodology')
+    })
+
+    it('lists every source with its license on Data sources', () => {
+      window.history.replaceState(null, '', '/?page=sources')
+      render(<App />)
+      expect(screen.getByRole('heading', { level: 1, name: 'Data sources' })).toBeInTheDocument()
+      for (const name of [/World Bank/, /mledoze\/countries/, /World Factbook/, /country-codes/]) {
+        expect(screen.getByRole('heading', { level: 2, name })).toBeInTheDocument()
+      }
+      expect(screen.getByRole('link', { name: 'CC BY 4.0' })).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'ODbL 1.0' })).toBeInTheDocument()
+    })
+  })
 })

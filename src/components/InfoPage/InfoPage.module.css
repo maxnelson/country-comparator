@@ -1,0 +1,118 @@
+/* Reading pages (Methodology, Data sources): one comfortable text column */
+
+.page {
+  position: sticky;
+  left: 0; /* the page scroller can scroll sideways; text never should */
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: var(--space-5) var(--layout-gutter) var(--space-6);
+  line-height: 1.6;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--color-link-hover);
+}
+
+.title {
+  margin: var(--space-2) 0 var(--space-4);
+  font-size: var(--font-size-xl);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.page h2 {
+  margin: var(--space-6) 0 var(--space-2);
+  font-size: var(--font-size-lg);
+  line-height: 1.3;
+}
+
+.page p,
+.page ul {
+  margin: 0 0 var(--space-3);
+}
+
+.page ul {
+  padding-left: var(--space-5);
+}
+
+.page a:not(.back) {
+  color: var(--color-link);
+  text-decoration-color: var(--color-border-strong);
+  text-underline-offset: 0.15em;
+}
+
+.page a:not(.back):hover {
+  color: var(--color-link-hover);
+  text-decoration-color: currentColor;
+}
+
+.muted {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Wide tables scroll inside their own box, never the page */
+.tableWrap {
+  overflow-x: auto;
+  margin: 0 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.table th {
+  background: var(--color-bg-subtle);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table code {
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+.source {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.source h2 {
+  margin-top: 0;
+}
+
+.attribution {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+}

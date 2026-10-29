@@ -1,3 +1,4 @@
+import { pageHref } from '../../state/page.js'
 import styles from './Footer.module.css'
 
 const COLUMNS = [
@@ -6,13 +7,13 @@ const COLUMNS = [
     links: [
       { label: 'Compare countries', href: '#' },
       { label: 'Browse all', href: '#' },
-      { label: 'Methodology', href: '#' },
+      { label: 'Methodology', href: pageHref('methodology') },
     ],
   },
   {
     heading: 'Resources',
     links: [
-      { label: 'Data sources', href: '#' },
+      { label: 'Data sources', href: pageHref('sources') },
       { label: 'API', href: '#' },
       { label: 'FAQ', href: '#' },
     ],

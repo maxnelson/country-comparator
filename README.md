@@ -35,7 +35,7 @@ npm run build      # static output in dist/
 
 The CIA stopped publishing the World Factbook in February 2026. Its values here come from the final edition (mostly 2024 and 2025 estimates) and will not refresh; everything else refreshes from the World Bank.
 
-Values are stored in source units (km², USD, m); `src/data/metrics.js` converts for display.
+Values are stored in source units (km², USD, m); `src/data/metrics.js` converts for display. The app's Methodology and Data sources pages (`?page=methodology`, `?page=sources`) explain the same in plain language, with each source's attribution.
 
 ## Deploy
 

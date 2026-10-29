@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Renders the app icon to every size the web app manifest and iOS need, and
-// rewrites public/favicon.svg from the same drawing. Run after changing the
+// rewrites public/favicon.svg and the header's public/mark-bars-white.svg from
+// the same drawing. Run after changing the
 // icon; the PNGs are committed.
 //
 //   node scripts/make-icons.mjs
@@ -18,9 +19,9 @@ import path from 'node:path'
 const PUBLIC = fileURLToPath(new URL('../public/', import.meta.url))
 
 // Brand colours, mirroring src/styles/tokens.css. The background is the header
-// colour (--teal-600), which is also the manifest's theme_color. Solid, not a
+// colour (--blue-700), which is also the manifest's theme_color. Solid, not a
 // gradient: the PNGs are precached, and a gradient makes them ten times larger.
-const TEAL_600 = '#218573'
+const BLUE_700 = '#2569B8'
 const WHITE = '#FFFFFF'
 
 // The glyph: two pill-shaped bars of different heights, two things compared.
@@ -49,7 +50,7 @@ function iconSvg({ bleed, scale }, size) {
   ).join('')
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"${dim}>` +
-    `<rect width="512" height="512" rx="${rx}" fill="${TEAL_600}"/>` +
+    `<rect width="512" height="512" rx="${rx}" fill="${BLUE_700}"/>` +
     `<g transform="translate(256 256) scale(${scale}) translate(-256 -256)">${bars}</g>` +
     `</svg>`
   )
@@ -63,6 +64,24 @@ async function loadPlaywright() {
     return createRequire(path.join(globalRoot, 'index.js'))('playwright')
   }
 }
+
+// The SVGs need no browser, so they are written first.
+writeFileSync(path.join(PUBLIC, 'favicon.svg'), iconSvg({ bleed: false, scale: 1 }) + '\n')
+console.log('favicon.svg')
+
+// The header mark: the bars alone in white, cropped to their bounding box.
+const left = Math.min(...BARS.map((b) => b.x))
+const top = Math.min(...BARS.map((b) => b.y))
+const right = Math.max(...BARS.map((b) => b.x + b.w))
+const bottom = Math.max(...BARS.map((b) => b.y + b.h))
+const markBars = BARS.map(
+  (b) => `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="${b.w / 2}" fill="${WHITE}"/>`,
+).join('')
+writeFileSync(
+  path.join(PUBLIC, 'mark-bars-white.svg'),
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${left} ${top} ${right - left} ${bottom - top}">${markBars}</svg>\n`,
+)
+console.log('mark-bars-white.svg')
 
 const { chromium } = await loadPlaywright()
 const executablePath = ['/opt/pw-browsers/chromium'].find((p) => existsSync(p))
@@ -79,6 +98,3 @@ for (const target of TARGETS) {
   console.log(`${target.file}  ${png.length} bytes`)
 }
 await browser.close()
-
-writeFileSync(path.join(PUBLIC, 'favicon.svg'), iconSvg({ bleed: false, scale: 1 }) + '\n')
-console.log('favicon.svg')

@@ -156,7 +156,7 @@ function CountryHeader({ country, index, editing, canRemove, onRemove, tableRef 
     if (!table) return
     table.style.setProperty(`--col-transform-${col}`, transformString ?? 'none')
     table.style.setProperty(`--col-transition-${col}`, transition ?? 'none')
-    table.style.setProperty(`--col-bg-${col}`, isDragging ? 'var(--mint-50)' : 'transparent')
+    table.style.setProperty(`--col-bg-${col}`, isDragging ? 'var(--color-brand-tint)' : 'transparent')
     return () => {
       table.style.removeProperty(`--col-transform-${col}`)
       table.style.removeProperty(`--col-transition-${col}`)

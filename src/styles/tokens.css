@@ -3,29 +3,18 @@
      Palette — raw color scales
      ============================================================ */
 
-  /* Mint — brand color, anchored on user-chosen #7BD39B (mint-400) */
-  --mint-50:  #EFFAF3;
-  --mint-100: #D7F3E0;
-  --mint-200: #AEE6C2;
-  --mint-300: #92DCAC;
-  --mint-400: #7BD39B; /* brand anchor */
-  --mint-500: #4FB678;
-  --mint-600: #34995F;
-  --mint-700: #277A4B;
-  --mint-800: #1F5B38;
-  --mint-900: #173F27;
-
-  /* Teal — sibling hue (~175°), for accents and large surfaces */
-  --teal-50:  #EBF9F6;
-  --teal-100: #CFF1EB;
-  --teal-200: #A1E2D6;
-  --teal-300: #6FCFBD;
-  --teal-400: #4BBBA5;
-  --teal-500: #2EA189;
-  --teal-600: #218573;
-  --teal-700: #1A695C;
-  --teal-800: #155248;
-  --teal-900: #103D36;
+  /* Blue — brand. OKLCH ramp (hue 255, peak chroma 0.15) on the same
+     lightness steps the old mint ramp used. blue-700 is the anchor. */
+  --blue-50:  #F4F8FE;
+  --blue-100: #E4EFFE;
+  --blue-200: #CAE0FD;
+  --blue-300: #B1D2FE;
+  --blue-400: #98C4FD;
+  --blue-500: #59A0F9;
+  --blue-600: #3D84DB;
+  --blue-700: #2569B8; /* brand anchor: header, primary fills, mark */
+  --blue-800: #124F93;
+  --blue-900: #06376C;
 
   /* Gray — neutral scale (cool/zinc) */
   --gray-50:  #FAFAFA;
@@ -39,9 +28,14 @@
   --gray-800: #27272A;
   --gray-900: #18181B;
 
+  /* Red — destructive only */
+  --red-600: #DC2626;
+  --red-700: #B91C1C;
+
   /* ============================================================
      Semantic tokens — reference palette above
      Change these to re-theme; leave palette alone.
+     Components must use these, never --blue-* / --gray-* directly.
      ============================================================ */
 
   /* Text */
@@ -50,25 +44,35 @@
   --color-text-inverse: #ffffff;
 
   /* Surfaces */
-  --color-bg:        #ffffff;
-  --color-bg-subtle: var(--gray-50);
-  --color-border:    var(--gray-200);
+  --color-bg:            #ffffff;
+  --color-bg-subtle:     var(--gray-50);
+  --color-border:        var(--gray-200);
+  --color-border-strong: var(--gray-300);
 
   /* Links */
   --color-link:       var(--gray-900);
-  --color-link-hover: var(--teal-700);
+  --color-link-hover: var(--blue-700);
 
   /* Brand */
-  --color-brand:        var(--mint-400);
-  --color-brand-strong: var(--mint-600);
-  --color-brand-subtle: var(--mint-50);
-  --color-accent:       var(--teal-500);
-  --color-danger:       #DC2626;
-  --color-danger-strong: #B91C1C;
+  --color-brand:             var(--blue-400);
+  --color-brand-strong:      var(--blue-700); /* was mint-600; now passes 4.5:1 with white */
+  --color-brand-stronger:    var(--blue-800); /* hover / pressed on brand-strong */
+  --color-brand-tint:        var(--blue-50);  /* hover fill, active option, dragged column */
+  --color-brand-tint-border: var(--blue-300);
+  --color-accent:            var(--blue-500); /* focus rings */
+  --color-danger:            var(--red-600);
+  --color-danger-strong:     var(--red-700);
 
   /* Header */
-  --color-header-bg:   var(--teal-600);
+  --color-header-bg:   var(--blue-700);
   --color-header-text: var(--color-text-inverse);
+
+  /* Controls & overlays */
+  --color-handle:         var(--gray-400);
+  --color-disabled-fill:  var(--gray-300);
+  --color-grabber:        var(--gray-300);
+  --color-backdrop:       rgba(24, 24, 27, 0.4);
+  --color-backdrop-light: rgba(24, 24, 27, 0.12);
 
   /* Spacing */
   --space-1: 0.25rem;
@@ -79,8 +83,27 @@
   --space-6: 2rem;
   --space-8: 3rem;
 
+  /* Radii */
+  --radius-sm:   6px;   /* drag handles */
+  --radius-md:   10px;  /* buttons, inputs, picker options, dragged header cell */
+  --radius-lg:   12px;  /* desktop popover */
+  --radius-xl:   16px;  /* phone sheet top corners */
+  --radius-full: 999px; /* round icon buttons */
+
+  /* Elevation */
+  --shadow-sm:    0 1px 2px rgba(0, 0, 0, 0.18);
+  --shadow-md:    0 6px 20px rgba(0, 0, 0, 0.16);
+  --shadow-lg:    0 12px 32px rgba(0, 0, 0, 0.16);
+  --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.18);
+
+  /* Motion */
+  --duration-fast:    0.15s;
+  --duration-sheet:   0.2s;
+  --duration-popover: 0.12s;
+
   /* Typography */
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
@@ -91,6 +114,7 @@
   --layout-header-height: 56px;
   --layout-gutter: 1rem;
   --layout-breakpoint-md: 768px; /* documentation only: media queries cannot read custom properties */
+  --touch-target: 44px;
 }
 
 @media (min-width: 768px) {

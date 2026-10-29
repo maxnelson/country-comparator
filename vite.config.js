@@ -21,7 +21,7 @@ export default defineConfig({
         name: 'Country Comparator',
         short_name: 'Countries',
         description: 'Compare countries side by side: population, economy, geography and more.',
-        theme_color: '#218573', // --teal-600, the header colour
+        theme_color: '#2569B8', // --blue-700, the header colour
         background_color: '#ffffff',
         display: 'standalone',
         icons: [

@@ -57,6 +57,11 @@
   border-top: 0;
 }
 
+/* The pinned header row draws its own bottom border; avoid doubling it. */
+.headerRow + .row {
+  border-top: 0;
+}
+
 /* ---------- Header row (pinned top) ---------- */
 
 .headerRow {
@@ -125,9 +130,9 @@
   border-radius: 50%;
   background: var(--color-brand-strong);
   color: var(--color-text-inverse);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: background 0.15s, transform 0.15s;
+  transition: background var(--duration-fast), transform var(--duration-fast);
 }
 
 /* 44px touch target around the 36px button */
@@ -138,7 +143,7 @@
 }
 
 .addColumnButton:hover:not(:disabled) {
-  background: var(--mint-700);
+  background: var(--color-brand-stronger);
 }
 
 .addColumnButton:active:not(:disabled) {
@@ -146,7 +151,7 @@
 }
 
 .addColumnButton:disabled {
-  background: var(--gray-300);
+  background: var(--color-disabled-fill);
   box-shadow: none;
   cursor: default;
 }
@@ -226,7 +231,7 @@
   background: var(--color-danger);
   color: var(--color-text-inverse);
   cursor: pointer;
-  transition: background 0.15s, transform 0.15s;
+  transition: background var(--duration-fast), transform var(--duration-fast);
 }
 
 /* 44px touch target around a 24px button */
@@ -274,9 +279,9 @@
   height: 28px;
   padding: 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--gray-400);
+  color: var(--color-handle);
   cursor: grab;
   touch-action: none; /* the handle drags; the rest of the row still scrolls */
 }
@@ -319,14 +324,14 @@
 .row[data-dragging] {
   z-index: 2;
   background: var(--color-bg);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  box-shadow: var(--shadow-md);
 }
 
 .headerCell[data-dragging] {
   z-index: 2;
-  background: var(--mint-50);
-  border-radius: 10px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  background: var(--color-brand-tint);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
 }
 
 /* ---------- Toolbar row: add metric + edit (pinned bottom) ---------- */
@@ -362,14 +367,14 @@
   min-height: 44px;
   padding: 0 var(--space-4) 0 var(--space-3);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--color-bg);
   color: var(--color-text);
   font: inherit;
   font-size: var(--font-size-sm);
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
 }
 
 .addRowButton {
@@ -383,8 +388,8 @@
 
 .addRowButton:hover:not(:disabled),
 .editButton:hover:not(.editing) {
-  background: var(--mint-50);
-  border-color: var(--mint-300);
+  background: var(--color-brand-tint);
+  border-color: var(--color-brand-tint-border);
   color: var(--color-brand-strong);
 }
 
@@ -397,6 +402,11 @@
   background: var(--color-brand-strong);
   border-color: var(--color-brand-strong);
   color: var(--color-text-inverse);
+}
+
+.editing:hover {
+  background: var(--color-brand-stronger);
+  border-color: var(--color-brand-stronger);
 }
 
 /* ---------- Wide screens: label column, roomier type ---------- */

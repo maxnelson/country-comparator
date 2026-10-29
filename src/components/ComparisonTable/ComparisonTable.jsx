@@ -22,7 +22,7 @@ import {
 } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
 import { COUNTRIES } from '../../data/countries.js'
-import { METRICS, metricValue } from '../../data/metrics.js'
+import { METRICS, metricValue, metricYear, commonYear } from '../../data/metrics.js'
 import Picker from '../Picker/Picker.jsx'
 import { buildSearch, parseSearch, titleFor } from '../../state/urlState.js'
 import { moveItem } from './reorder.js'
@@ -79,9 +79,18 @@ function GripIcon() {
   )
 }
 
+// A value reported for a different year from the rest of its row says which
+function ValueYear({ metric, country, rowYear }) {
+  if (metricValue(metric, country) === null) return null
+  const year = metricYear(metric, country)
+  if (year === null || year === rowYear) return null
+  return <span className={styles.valueYear}>{year}</span>
+}
+
 function MetricRow({ metric, countries, editing, canRemove, onRemove }) {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
     useSortable({ id: metric.key, disabled: !editing })
+  const year = commonYear(metric, countries)
 
   return (
     <div
@@ -105,7 +114,8 @@ function MetricRow({ metric, countries, editing, canRemove, onRemove }) {
               <GripIcon />
             </button>
           )}
-          {metric.label}
+          <span>{metric.label}</span>
+          {year !== null && <span className={styles.labelYear}>{year}</span>}
         </span>
       </div>
       {countries.map((country, i) => (
@@ -122,6 +132,7 @@ function MetricRow({ metric, countries, editing, canRemove, onRemove }) {
           role="cell"
         >
           {metric.format(metricValue(metric, country))}
+          <ValueYear metric={metric} country={country} rowYear={year} />
         </div>
       ))}
       {/* The add-country lane continues down every row; it holds the delete button while editing */}

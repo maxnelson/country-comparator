@@ -104,6 +104,25 @@
   hyphens: auto;
 }
 
+/* Data years: the row's usual year beside the label, and a year under any
+   value reported for another one. Discreet on purpose. */
+.labelYear {
+  margin-left: calc(var(--space-1) - var(--space-2)); /* tighter than the label's gap */
+  font-variant-numeric: tabular-nums;
+}
+
+.labelYear::before {
+  content: '· ';
+}
+
+.valueYear {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--color-text-muted);
+}
+
 /* ---------- Add-country lane: its own pinned column at the right edge ---------- */
 
 .addColumnCell {

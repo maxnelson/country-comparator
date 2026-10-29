@@ -70,7 +70,7 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 - [x] Data refresh script (`scripts/fetch-data.mjs`); every World Bank value carries the year it was reported for
 - [x] All 201 countries and territories (UN members, independents, plus Taiwan, Kosovo, Palestine, Hong Kong, Macao, Puerto Rico, Greenland)
 - [x] CIA World Factbook (public domain) for median age and coastline, plus urban population, fertility rate, infant mortality, physician density, highest point, airports, Gini index, inflation, GDP growth, military spending as % of GDP, electricity access and government type. The CIA stopped publishing it in February 2026, so these come from the final edition and will not refresh.
-- [ ] Show the data year somewhere discreet (values range from 2021 to 2025 depending on the series)
+- [x] Show the data year somewhere discreet: the year most of the row's values were reported for sits beside the metric's label, and any value reported for another year carries its own year underneath
 - [ ] Methodology and Data Sources pages (currently dead footer links), with the attribution each license asks for
 - [ ] Monthly refresh via a scheduled GitHub Action that opens a commit when data changed
 

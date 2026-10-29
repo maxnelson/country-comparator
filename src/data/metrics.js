@@ -7,6 +7,8 @@
 // Numeric metrics come from the World Bank and the CIA World Factbook; capital
 // and currency from the catalog. See scripts/fetch-data.mjs.
 
+import { DATA_SOURCES } from './countries.js'
+
 const compact = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 })
 const withCommas = (v) => Math.round(v).toLocaleString('en-US')
 const oneDecimal = (v) => v.toLocaleString('en-US', { maximumFractionDigits: 1 })
@@ -62,4 +64,33 @@ export function metricValue(metric, country) {
 // Year the value was reported for, when the source records one
 export function metricYear(metric, country) {
   return country.years?.[metric.source ?? metric.key] ?? null
+}
+
+// The year most of these countries' values were reported for (the later year
+// on a tie), or null when none of them records one. The table shows it beside
+// the metric's label and marks only the values reported for another year.
+export function commonYear(metric, countries) {
+  const counts = new Map()
+  for (const country of countries) {
+    const year = metricValue(metric, country) === null ? null : metricYear(metric, country)
+    if (year !== null) counts.set(year, (counts.get(year) ?? 0) + 1)
+  }
+  let best = null
+  for (const [year, count] of counts) {
+    const bestCount = counts.get(best) ?? 0
+    if (count > bestCount || (count === bestCount && year > best)) best = year
+  }
+  return best
+}
+
+const CATALOG_KEYS = new Set(['capital', 'currency'])
+
+// Where a metric's values come from: the World Bank (with its indicator code),
+// the country catalog, or the CIA World Factbook. Keys are DATA_SOURCES keys.
+export function metricSource(metric) {
+  const key = metric.source ?? metric.key
+  const indicator = DATA_SOURCES.worldbank.indicators[key]
+  if (indicator) return { id: 'worldbank', indicator }
+  if (CATALOG_KEYS.has(key)) return { id: 'catalog' }
+  return { id: 'factbook' }
 }

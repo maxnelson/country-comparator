@@ -28,6 +28,21 @@ describe('App', () => {
     expect(within(row).getAllByRole('cell')).toHaveLength(3)
   })
 
+  it('shows the data year by the label, and under values reported for another year', () => {
+    // Gini: Japan and Germany report for 2020, the United States for 2023
+    window.history.replaceState(null, '', '/?countries=us-jp-de&metrics=population-gini')
+    render(<App />)
+    const [population, gini] = screen.getAllByRole('row').slice(1, 3)
+    expect(within(population).getByRole('rowheader')).toHaveTextContent('Population2025')
+    expect(within(population).getAllByRole('cell').map((c) => c.textContent)).not.toContain(
+      expect.stringMatching(/2025/),
+    )
+    expect(within(gini).getByRole('rowheader')).toHaveTextContent('2020')
+    const [us, jp] = within(gini).getAllByRole('cell')
+    expect(us).toHaveTextContent('41.82023')
+    expect(jp).toHaveTextContent(/^32\.3$/)
+  })
+
   it('keeps the toolbar row with Add metric as the last row', () => {
     render(<App />)
     const rows = screen.getAllByRole('row')

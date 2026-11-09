@@ -1,5 +1,5 @@
-/* Sits under the header, inside the page scroller. Sticky left like the
-   header so it stays put when the table scrolls sideways. */
+/* Sits directly on top of the footer, inside the page scroller. Sticky left
+   like the footer so it stays put when the table scrolls sideways. */
 .hint {
   position: sticky;
   left: 0;
@@ -8,7 +8,7 @@
   gap: var(--space-3);
   padding: var(--space-2) var(--space-2) var(--space-2) var(--layout-gutter);
   background: var(--color-brand-tint);
-  border-bottom: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-border);
   color: var(--color-text);
   font-size: var(--font-size-sm);
   line-height: 1.4;

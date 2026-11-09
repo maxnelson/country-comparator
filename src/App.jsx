@@ -23,12 +23,12 @@ function App() {
           sideways. */}
       <div className={styles.scroller}>
         <Header />
-        <InstallHint />
         <main className={styles.main}>
           {page === 'methodology' && <MethodologyPage />}
           {page === 'sources' && <SourcesPage />}
           {!page && <ComparisonTable />}
         </main>
+        <InstallHint />
         <Footer />
       </div>
     </div>

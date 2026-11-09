@@ -135,7 +135,7 @@ function MetricRow({ metric, countries, editing, canRemove, onRemove }) {
           <ValueYear metric={metric} country={country} rowYear={year} />
         </div>
       ))}
-      {/* The add-country lane continues down every row; it holds the delete button while editing */}
+      {/* The right-hand lane continues down every row; it holds the delete button while editing */}
       <div className={styles.lane} role="cell" aria-hidden={editing ? undefined : true}>
         {editing && (
           <button
@@ -309,7 +309,7 @@ function ComparisonTable() {
       aria-label="Country comparison"
     >
     {/* Header row: pinned to the top. Flags + names (sortable while editing),
-        then the add-country cell pinned right. */}
+        then the top of the right-hand lane, which holds the row deletes. */}
     <div className={`${styles.row} ${styles.headerRow}`} role="row">
       <div className={styles.corner} role="columnheader" aria-label="Metric" />
       <DndContext
@@ -333,19 +333,7 @@ function ComparisonTable() {
           ))}
         </SortableContext>
       </DndContext>
-      <div className={styles.addColumnCell} role="columnheader">
-          <button
-            ref={addCountryButtonRef}
-            type="button"
-            className={styles.addColumnButton}
-            onClick={() => countryPickerRef.current?.open(addCountryButtonRef.current)}
-            disabled={!canAddCountry}
-            aria-label="Add country"
-            title="Add country"
-          >
-            <PlusIcon />
-          </button>
-        </div>
+      <div className={styles.laneHeader} role="columnheader" aria-hidden="true" />
       </div>
 
       {/* One row per metric: label (pinned left), then one value per country.
@@ -371,18 +359,30 @@ function ComparisonTable() {
         </SortableContext>
       </DndContext>
 
-      {/* Toolbar row: always the last row, pinned to the bottom */}
+      {/* Toolbar row: always the last row, pinned to the bottom. Add metric and
+          Add country on the left, Edit/Done on the right. */}
       <div className={`${styles.row} ${styles.addRow}`} role="row">
         <div className={styles.addRowCell} role="cell">
-          <button
-            ref={addMetricButtonRef}
-            type="button"
-            className={styles.addRowButton}
-            onClick={() => metricPickerRef.current?.open(addMetricButtonRef.current)}
-            disabled={!canAddMetric}
-          >
-            <PlusIcon /> Add metric
-          </button>
+          <div className={styles.addButtons}>
+            <button
+              ref={addMetricButtonRef}
+              type="button"
+              className={styles.addRowButton}
+              onClick={() => metricPickerRef.current?.open(addMetricButtonRef.current)}
+              disabled={!canAddMetric}
+            >
+              <PlusIcon /> Add metric
+            </button>
+            <button
+              ref={addCountryButtonRef}
+              type="button"
+              className={styles.addRowButton}
+              onClick={() => countryPickerRef.current?.open(addCountryButtonRef.current)}
+              disabled={!canAddCountry}
+            >
+              <PlusIcon /> Add country
+            </button>
+          </div>
           <button
             type="button"
             className={editing ? `${styles.editButton} ${styles.editing}` : styles.editButton}

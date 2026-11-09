@@ -2,7 +2,7 @@
 
 Living plan for the project. Work is grouped into phases; within a phase, items are in rough priority order. Tick items off as they ship. Raw ideas go in the **Inbox** at the bottom until they are sorted into a phase. Decisions that shape the project are logged in the **Decisions** table so future sessions know why things are the way they are.
 
-Last updated: 2026-10-29
+Last updated: 2026-11-09
 
 ---
 
@@ -29,6 +29,7 @@ A fast, mobile-first quick-reference tool for comparing countries side by side. 
 | D5 | **Data:** ships as a committed JSON built by `npm run data:refresh` (no runtime fetching), from the World Bank Indicators API (CC BY 4.0) for numbers and mledoze/countries (ODbL 1.0) for the catalog; CIA World Factbook (public domain) next for median age and coastline. Wikidata (CC0) is the fallback for the catalog if ODbL share-alike ever matters. The Factbook is a frozen archive since the CIA ended it in February 2026; its fields will need a living source eventually (UN World Population Prospects for median age and fertility). | Confirmed 2026-10-18 | Dropped for now: public debt (World Bank series sparse and decades stale), tourist arrivals (series ends in the 2020 pandemic year), average temperature, UNESCO sites, top income tax rate (no clean source yet). |
 | D6 | **PWA shell:** `vite-plugin-pwa` with a Workbox service worker that precaches the whole build, data included, so the app opens offline. Update strategy is `autoUpdate`: a new deploy installs in the background and the page reloads itself, which loses nothing because all state is in the URL. Home-screen name "Countries"; icon is two bars on the header colour, drawn in `scripts/make-icons.mjs`. | Confirmed 2026-10-18 | The alternative, a "new version available" prompt, is more UI for no gain here. Short name because iOS truncates labels at about 12 characters. |
 | D4 | **Table interaction model:** frozen-panes grid (horizontal scroll with minimum column widths; pinned header row, label column, add-country button and add-metric row), search-based pickers in a bottom sheet / popover, and an Edit mode for remove and drag-reorder. | Confirmed 2026-10-17 | Owner's proposal, refined in discussion. Replaced the fit-to-width layout and compact-number tiers from Phase 1. |
+| D8 | **Default comparison and toolbar:** a fresh visit (no countries in the URL) compares the United States with one other country picked at random on each load. Add country is a labelled button in the pinned bottom toolbar beside Add metric, replacing the round plus button in the header. The iOS install banner sits on top of the footer instead of under the header. | Confirmed 2026-11-09 | Owner's request. The right-hand lane stays, since it holds the row deletes in Edit mode. Shared links are unaffected: they always name their countries. |
 | D7 | **Visual identity:** single blue brand ramp (blue-700 #2569B8), rounded-bars mark, tokenized radii/shadows/motion. Replaces the mint and teal palette; components reference only semantic tokens. | Confirmed 2026-10-29 | From the owner's design handoff in `design_handoff_blue_refresh/` (kept in the repo as reference). The handoff asked for this as D6, which was already taken by the PWA shell. |
 
 ---

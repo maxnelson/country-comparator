@@ -7,12 +7,12 @@
    when they don't the table is wider than the viewport and the page's
    scroll container scrolls sideways. Everything "pinned" is position:
    sticky against that scroll container: the header row (top), metric
-   labels (left), the add-country lane (right), the toolbar row
+   labels (left), the right-hand lane (right), the toolbar row
    (bottom). Nothing between the scroller and this table may set
    overflow other than visible or clip, or the pinning stops working.
 
    Vertical padding lives in the cells, not the rows, so pinned cells
-   (label column, add lane) span a row's full height and their borders
+   (label column, right lane) span a row's full height and their borders
    run unbroken. Rows carry only the left gutter.
 
    Phones: a metric label spans the row above its values (grid row 1),
@@ -22,7 +22,7 @@
 
 .table {
   --col-min: 96px; /* floor for a value column; content can make it wider */
-  --add-col: 48px; /* the add-country lane on the right */
+  --add-col: 48px; /* the right-hand lane: holds row deletes while editing */
   --value-col-start: 0; /* value i lands in column (start + i) */
   --value-row: 2;
   --pane-left: 0px; /* where sticky-left cells pin */
@@ -123,9 +123,9 @@
   color: var(--color-text-muted);
 }
 
-/* ---------- Add-country lane: its own pinned column at the right edge ---------- */
+/* ---------- Right-hand lane: its own pinned column at the right edge ---------- */
 
-.addColumnCell {
+.laneHeader {
   grid-column: -2 / -1;
   grid-row: 1;
   position: sticky;
@@ -135,44 +135,7 @@
   align-items: center;
   justify-content: center;
   align-self: stretch;
-  background: var(--color-bg-subtle); /* same as the header, so the button floats */
-}
-
-.addColumnButton {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: 0;
-  border-radius: 50%;
-  background: var(--color-brand-strong);
-  color: var(--color-text-inverse);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: background var(--duration-fast), transform var(--duration-fast);
-}
-
-/* 44px touch target around the 36px button */
-.addColumnButton::before {
-  content: '';
-  position: absolute;
-  inset: -4px;
-}
-
-.addColumnButton:hover:not(:disabled) {
-  background: var(--color-brand-stronger);
-}
-
-.addColumnButton:active:not(:disabled) {
-  transform: scale(0.94);
-}
-
-.addColumnButton:disabled {
-  background: var(--color-disabled-fill);
-  box-shadow: none;
-  cursor: default;
+  background: var(--color-bg-subtle); /* same as the header */
 }
 
 .plusIcon {
@@ -221,7 +184,7 @@
   hyphens: auto;
 }
 
-/* The lane continues down every row, pinned like the header's add cell.
+/* The lane continues down every row, pinned like its header cell.
    It is transparent: row deletes float here while editing, and a dragged
    column's tint shows through instead of being cut off by white boxes. */
 .lane {
@@ -353,7 +316,7 @@
   box-shadow: var(--shadow-md);
 }
 
-/* ---------- Toolbar row: add metric + edit (pinned bottom) ---------- */
+/* ---------- Toolbar row: add metric, add country, edit (pinned bottom) ---------- */
 
 .addRow {
   position: sticky;
@@ -397,7 +360,15 @@
 }
 
 .addRowButton {
+  position: static;
+}
+
+/* The two add buttons pin left together, as one group */
+.addButtons {
+  position: sticky;
   left: var(--pane-pad);
+  display: flex;
+  gap: var(--space-2);
 }
 
 .editButton {
@@ -488,15 +459,6 @@
 
   .value {
     padding: var(--row-pad-y) var(--space-2);
-  }
-
-  .addColumnButton {
-    width: 44px;
-    height: 44px;
-  }
-
-  .addColumnButton::before {
-    inset: 0;
   }
 
   .plusIcon {

@@ -8,7 +8,15 @@ import { METRICS, DEFAULT_VISIBLE_METRIC_COUNT } from '../data/metrics.js'
 // comparison. Hyphens separate ids (metric keys contain underscores, and a
 // plus sign would decode as a space).
 
-export const DEFAULT_CODES = ['US', 'JP', 'DE']
+// A fresh visit compares the United States with one other country, picked at
+// random on each load so the app shows something different every time.
+export const DEFAULT_FIRST_CODE = 'US'
+const DEFAULT_OTHERS = COUNTRIES.filter((c) => c.code !== DEFAULT_FIRST_CODE).map((c) => c.code)
+
+export function defaultCodes(random = Math.random) {
+  const index = Math.min(Math.floor(random() * DEFAULT_OTHERS.length), DEFAULT_OTHERS.length - 1)
+  return [DEFAULT_FIRST_CODE, DEFAULT_OTHERS[index]]
+}
 export const DEFAULT_METRIC_KEYS = METRICS.slice(0, DEFAULT_VISIBLE_METRIC_COUNT).map(
   (m) => m.key,
 )
@@ -39,7 +47,8 @@ function parseList(value, valid, normalize) {
   return out.length ? out : null
 }
 
-export function parseSearch(search) {
+// `random` picks the second default country when the URL names none
+export function parseSearch(search, random = Math.random) {
   const params = new URLSearchParams(search)
   const codes = parseList(
     params.get(COUNTRY_PARAM) ?? params.get(LEGACY_COUNTRY_PARAM),
@@ -51,7 +60,7 @@ export function parseSearch(search) {
     VALID_METRIC_KEYS,
     (s) => s.toLowerCase(),
   )
-  return { codes: codes ?? DEFAULT_CODES, metricKeys: metricKeys ?? DEFAULT_METRIC_KEYS }
+  return { codes: codes ?? defaultCodes(random), metricKeys: metricKeys ?? DEFAULT_METRIC_KEYS }
 }
 
 export function buildSearch({ codes, metricKeys }) {

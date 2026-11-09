@@ -1,5 +1,5 @@
 import { render, screen, within, fireEvent } from '@testing-library/react'
-import { afterEach, describe, it, expect } from 'vitest'
+import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import App from './App.jsx'
 import { DEFAULT_METRIC_KEYS } from './state/urlState.js'
 
@@ -8,19 +8,26 @@ const DEFAULT_METRICS = DEFAULT_METRIC_KEYS.join('-')
 // Tests share one jsdom window; leave the URL clean for the next one
 afterEach(() => window.history.replaceState(null, '', '/'))
 
+// Most tests start from a fixed three-country comparison, since the default
+// second country is random
+const THREE = '/?countries=us-jp-de'
+const start = (url = THREE) => window.history.replaceState(null, '', url)
+
 const search = (name) => screen.getByRole('combobox', { name })
 const button = (name) => screen.getByRole('button', { name })
 
 describe('App', () => {
-  it('renders the default comparison', () => {
+  it('renders the default comparison: the United States and one other country', () => {
     render(<App />)
     expect(screen.getByRole('table', { name: 'Country comparison' })).toBeInTheDocument()
-    expect(screen.getByText('United States')).toBeInTheDocument()
-    expect(screen.getByText('Japan')).toBeInTheDocument()
-    expect(screen.getByText('Germany')).toBeInTheDocument()
+    const headers = screen.getAllByRole('columnheader').filter((h) => h.textContent)
+    expect(headers).toHaveLength(2)
+    expect(headers[0]).toHaveTextContent('United States')
+    expect(headers[1]).not.toHaveTextContent('United States')
   })
 
   it('shows each metric label once, with one value per country', () => {
+    start()
     render(<App />)
     const label = screen.getByText('Population')
     expect(screen.getAllByText('Population')).toHaveLength(1)
@@ -43,10 +50,12 @@ describe('App', () => {
     expect(jp).toHaveTextContent(/^32\.3$/)
   })
 
-  it('keeps the toolbar row with Add metric as the last row', () => {
+  it('keeps the toolbar row with Add metric and Add country as the last row', () => {
     render(<App />)
     const rows = screen.getAllByRole('row')
     expect(within(rows.at(-1)).getByRole('button', { name: 'Add metric' })).toBeInTheDocument()
+    expect(within(rows.at(-1)).getByRole('button', { name: 'Add country' })).toBeInTheDocument()
+    expect(within(rows[0]).queryByRole('button', { name: 'Add country' })).not.toBeInTheDocument()
   })
 
   describe('URL state', () => {
@@ -62,10 +71,11 @@ describe('App', () => {
 
     it('replaces the bare URL with the default comparison', () => {
       render(<App />)
-      expect(window.location.search).toBe(`?countries=us-jp-de&metrics=${DEFAULT_METRICS}`)
+      expect(window.location.search).toMatch(new RegExp(`^\\?countries=us-[a-z]{2}&metrics=${DEFAULT_METRICS}$`))
     })
 
     it('writes changes back to the URL', () => {
+      start()
       render(<App />)
       fireEvent.click(button('Add country'))
       fireEvent.click(screen.getByRole('option', { name: /France/ }))
@@ -79,9 +89,9 @@ describe('App', () => {
     it('ignores junk in the URL and falls back to the defaults', () => {
       window.history.replaceState(null, '', '/?countries=xx-yy&metrics=nothing')
       render(<App />)
-      expect(screen.getByRole('columnheader', { name: /Japan/ })).toBeInTheDocument()
+      expect(screen.getByRole('columnheader', { name: /United States/ })).toBeInTheDocument()
       expect(screen.getByText('Population')).toBeInTheDocument()
-      expect(window.location.search).toBe(`?countries=us-jp-de&metrics=${DEFAULT_METRICS}`)
+      expect(window.location.search).toMatch(new RegExp(`^\\?countries=us-[a-z]{2}&metrics=${DEFAULT_METRICS}$`))
     })
 
     it('still opens links in the earlier short format', () => {
@@ -93,6 +103,8 @@ describe('App', () => {
   })
 
   describe('country picker', () => {
+    beforeEach(() => start())
+
     const openPicker = () => {
       fireEvent.click(button('Add country'))
       return screen.getByRole('dialog', { name: 'Add a country' })
@@ -144,6 +156,8 @@ describe('App', () => {
   })
 
   describe('metric picker', () => {
+    beforeEach(() => start())
+
     const openPicker = () => {
       fireEvent.click(button('Add metric'))
       return screen.getByRole('dialog', { name: 'Add a metric' })
@@ -168,6 +182,8 @@ describe('App', () => {
   })
 
   describe('edit mode', () => {
+    beforeEach(() => start())
+
     it('shows remove buttons only while editing', () => {
       render(<App />)
       expect(screen.queryByRole('button', { name: 'Remove Japan' })).not.toBeInTheDocument()

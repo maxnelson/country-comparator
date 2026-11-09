@@ -1,12 +1,28 @@
 import { describe, it, expect } from 'vitest'
-import { DEFAULT_CODES, DEFAULT_METRIC_KEYS, buildSearch, parseSearch, titleFor } from './urlState.js'
+import { COUNTRIES } from '../data/countries.js'
+import { DEFAULT_METRIC_KEYS, buildSearch, defaultCodes, parseSearch, titleFor } from './urlState.js'
 
 const DEFAULT_SEARCH = `?countries=us-jp-de&metrics=${DEFAULT_METRIC_KEYS.join('-')}`
+// A fixed "random" number, so the default second country is predictable
+const pick = (n) => () => n
+const DEFAULTS = { codes: defaultCodes(pick(0)), metricKeys: DEFAULT_METRIC_KEYS }
+
+describe('defaultCodes', () => {
+  it('is the United States and one other country', () => {
+    const others = COUNTRIES.filter((c) => c.code !== 'US')
+    expect(defaultCodes(pick(0))).toEqual(['US', others[0].code])
+    expect(defaultCodes(pick(0.999999))).toEqual(['US', others.at(-1).code])
+  })
+
+  it('never picks the United States twice', () => {
+    for (let n = 0; n < 1; n += 0.01) expect(defaultCodes(pick(n))[1]).not.toBe('US')
+  })
+})
 
 describe('parseSearch', () => {
   it('returns the defaults for an empty query', () => {
-    expect(parseSearch('')).toEqual({ codes: DEFAULT_CODES, metricKeys: DEFAULT_METRIC_KEYS })
-    expect(parseSearch('?')).toEqual({ codes: DEFAULT_CODES, metricKeys: DEFAULT_METRIC_KEYS })
+    expect(parseSearch('', pick(0))).toEqual(DEFAULTS)
+    expect(parseSearch('?', pick(0))).toEqual(DEFAULTS)
   })
 
   it('keeps the given order and normalises case', () => {
@@ -23,8 +39,8 @@ describe('parseSearch', () => {
   })
 
   it('falls back to the defaults when nothing valid remains', () => {
-    expect(parseSearch('?countries=xx&metrics=nope')).toEqual({ codes: DEFAULT_CODES, metricKeys: DEFAULT_METRIC_KEYS })
-    expect(parseSearch('?countries=&metrics=')).toEqual({ codes: DEFAULT_CODES, metricKeys: DEFAULT_METRIC_KEYS })
+    expect(parseSearch('?countries=xx&metrics=nope', pick(0))).toEqual(DEFAULTS)
+    expect(parseSearch('?countries=&metrics=', pick(0))).toEqual(DEFAULTS)
   })
 
   it('still reads the earlier short parameters and commas', () => {
@@ -38,7 +54,7 @@ describe('parseSearch', () => {
 
 describe('buildSearch', () => {
   it('always writes both parameters, lowercase and hyphen-separated', () => {
-    expect(buildSearch({ codes: DEFAULT_CODES, metricKeys: DEFAULT_METRIC_KEYS })).toBe(DEFAULT_SEARCH)
+    expect(buildSearch({ codes: ['US', 'JP', 'DE'], metricKeys: DEFAULT_METRIC_KEYS })).toBe(DEFAULT_SEARCH)
     expect(buildSearch({ codes: ['CA'], metricKeys: ['capital', 'currency'] })).toBe(
       '?countries=ca&metrics=capital-currency',
     )
